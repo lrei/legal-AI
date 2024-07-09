@@ -1,4 +1,6 @@
 import requests
+import re
+import re
 import fitz  # PyMuPDF
 
 url = "https://www.europarl.europa.eu/doceo/document/TA-9-2024-0138-FNL-COR01_EN.pdf"
@@ -21,36 +23,36 @@ def extract_text_from_pdf(pdf_path):
 extracted_text = extract_text_from_pdf(pdf_path)
 
 print(extracted_text)
-output_file = "data/extracted_text.txt"
-with open(output_file, 'w') as file:
+
+output_path = "data/extracted_text.txt"
+
+with open(output_path, 'w', encoding='utf-8') as file: # encoding mora biti na windowsu
     file.write(extracted_text)
 
+    with open(output_path, 'r', encoding='utf-8') as file:
+        text = file.read()
 
-# Splitting into sections with regex
+    matches = re.finditer(r'\nArticle (1[0-1][0-3]|[1-9][0-9]?|1[0-9]{2})\n.+\n', text)
+    positions = [match.start() for match in matches]
 
-import re
+    print(positions)
 
-# Define the regex pattern
-pattern = re.compile(r"Article (1[0-1][0-3]|[1-9][0-9]?|1[0-9]{2})\n.+\n", re.MULTILINE)
+    sections = []
+    start = 0
 
-# Read the content of the original document
-with open('input.txt', 'r') as file:
-    content = file.read()
+    for pos in positions:
+        section = extracted_text[start:pos]
+        sections.append(section)
+        start = pos
 
-# Find all matches
-matches = pattern.findall(content)
-matches_with_text = pattern.findall(content)
+    # Add the last section from the last position to the end of the text
+    sections.append(extracted_text[start:])
 
-# Create the output files
-with open('matches.txt', 'w') as match_file, open('separators.txt', 'w') as separator_file:
-    for match in matches_with_text:
-        match_file.write(match + "\n")
-        separator_file.write("--------------------\n")
+    sections_text = "\n---\n".join(sections)
 
-# Remove matches from the original document content
-updated_content = pattern.sub("", content)
+    sections_path = "data/sections.txt"
 
-# Write the updated content back to the original document
-with open('input.txt', 'w') as file:
-    file.write(updated_content)
+    with open(sections_path, 'w', encoding='utf-8') as file:
+        file.write(sections_text)
 
+    
