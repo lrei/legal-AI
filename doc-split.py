@@ -1,7 +1,7 @@
 import requests
 import re
-import re
 import fitz  # PyMuPDF
+import json
 
 url = "https://www.europarl.europa.eu/doceo/document/TA-9-2024-0138-FNL-COR01_EN.pdf"
 response = requests.get(url)
@@ -78,3 +78,21 @@ with open(output_path, 'w', encoding='utf-8') as file: # encoding mora biti na w
     
     with open(sections_path, 'w', encoding='utf-8') as file:
         file.write(separator)
+
+all_positions = positions2 + positions
+# Generating JSON
+with open(sections_path, 'r', encoding='utf-8') as file:
+    content = file.read()
+
+blocks = content.split('\n---\n')
+# creating a list of JSON objects
+objects = []
+for pos, block in enumerate(blocks):
+    object = {
+        "text": block,
+        "position": pos
+    }
+    objects.append(object)
+
+with open('data/output.json', 'w') as json_file:
+    json.dump(objects, json_file, indent=4)
