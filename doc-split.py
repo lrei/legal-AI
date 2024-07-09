@@ -35,7 +35,7 @@ with open(output_path, 'w', encoding='utf-8') as file: # encoding mora biti na w
     matches = re.finditer(r'\nArticle (1[0-1][0-3]|[1-9][0-9]?|1[0-9]{2})\n.+\n', text)
     positions = [match.start() for match in matches]
 
-    print(positions)
+    # print(positions)
 
     sections = []
     start = 0
@@ -48,11 +48,33 @@ with open(output_path, 'w', encoding='utf-8') as file: # encoding mora biti na w
     # Add the last section from the last position to the end of the text
     sections.append(extracted_text[start:])
 
-    sections_text = "\n---\n".join(sections)
+    separator = "\n---\n".join(sections)
 
     sections_path = "data/sections.txt"
 
     with open(sections_path, 'w', encoding='utf-8') as file:
-        file.write(sections_text)
-
+        file.write(separator)
     
+    with open(sections_path, 'r', encoding='utf-8') as file:
+        text2 = file.read()
+        # splittajmo še introduction torej [0:249423]
+        matches2 = re.finditer(r'\(\b(1[0-8][0-9]|[1-9]?[0-9])\b\)\n', text2[:249422])
+
+        positions2 = [match.start() for match in matches2]
+        print(len(positions2), "\n")
+        #splittamo po pos2
+
+        sections = []
+        start = 0
+
+        for pos in positions2:
+            section = text2[start:pos]
+            sections.append(section)
+            start = pos
+
+        # itak moramo vse nespremenjeno appendat. Zdaj lahko samo overwritamo vse, zato [start:]
+        sections.append(text2[start:]) 
+        separator = "\n---\n".join(sections)
+    
+    with open(sections_path, 'w', encoding='utf-8') as file:
+        file.write(separator)
