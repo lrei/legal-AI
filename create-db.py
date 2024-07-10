@@ -11,7 +11,7 @@ c = conn.cursor()
 
 # Step 3: Create a table to store text blocks (if not exists)
 c.execute('''
-CREATE TABLE IF NOT EXISTS text_blocks (
+CREATE TABLE IF NOT EXISTS blocks (
     id INTEGER PRIMARY KEY,
     position INTEGER,
     text TEXT
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS text_blocks (
 for block in blocks:
     position = block['position']
     text = block['text']
-    c.execute('INSERT INTO text_blocks (position, text) VALUES (?, ?)', (position, text))
+    c.execute('INSERT INTO blocks (position, text) VALUES (?, ?)', (position, text))
 
 # Commit changes and close connection
 conn.commit()
@@ -35,7 +35,7 @@ conn = sqlite3.connect('data/blocks.db')
 c = conn.cursor()
 
 position = 2  # Example position to retrieve
-c.execute('SELECT * FROM text_blocks WHERE position = ?', (position,))
+c.execute('SELECT * FROM blocks WHERE position = ?', (position,))
 rows = c.fetchall()
 
 print(f"Text blocks with position {position}:")
