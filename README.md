@@ -17,4 +17,10 @@ If we add another "source" document, we should also include the document title.
 ### Creating a database
 We used SQLite database.
 
-#### Encoding and storing into vector database
+### Encoding and storing into vector database
+We used all-MiniLM-L6-v2 sentence transformer. 
+We stored the vector data into a faiss database [vector_index.faiss]. 
+
+### Retrieval demo
+In [retrieval.py] user modifies the `query` variable, to get the desired blocks (Articles). Here we first assign the correct ids for the articles, and then retrieve those from the [blocks.db] database.
+If an error occurs while retrieving (so that the id is not found), we return the error. 
