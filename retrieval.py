@@ -1,50 +1,41 @@
-import json
-from bs4 import BeautifulSoup
-import re
+# Testing the retrieval from faiss
+# Demo
+import sqlite3
+import faiss
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
-# Load the HTML content from the file
-with open("data/ai-legalisation.html", "r", encoding="utf-8") as file:
-    html_content = file.read()
+conn = sqlite3.connect('data/blocks.db')
+c = conn.cursor()
 
-# Parse the HTML content
-soup = BeautifulSoup(html_content, "html.parser")
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# Initialize the JSON structure
-json_data = {
-    "Chapter": "",
-    "Article": "",
-    "Expected date": "January 2025",
-    "Summary": "",
-    "paragraphs": []
-}
+index = faiss.read_index('data/vector_index.faiss')
 
-# Extract chapter and article titles
-chapter_title = soup.find("p", class_="parent-title").get_text(strip=True)
-article_title = soup.find("p", id="sopen-art").get_text(strip=True)
+def search_similar_text(query_text, top_k=5):
+    query_vector = model.encode([query_text])[0]
 
-json_data["Chapter"] = chapter_title
-json_data["Article"] = article_title
+    D, I = index.search(np.array([query_vector]), top_k)
+    similar_texts = []
+    for i in range(top_k):
+        text_id = int(I[0][i])
+        c.execute('SELECT text FROM blocks WHERE id = ?', (text_id,))
+        row = c.fetchone()
 
-# Extract summary (assuming it's available in a known tag/class)
-summary = soup.find("div", class_="et_pb_text_inner").find_next("p").get_text(strip=True)
-json_data["Summary"] = summary
+        if row:
+            similar_texts.append(row[0])
+        else:
+            print(f"No text found for id: {text_id}")
 
-# Extract paragraphs
-content_div = soup.find("div", class_="et_pb_text_inner")
-paragraphs = content_div.find_all("p")
+    return similar_texts
+# Write any query -----------------------------------
+query = "Privacy"
+#-----------------------------------
 
-for para in paragraphs:
-    para_text = para.get_text(strip=True)
-    match = re.match(r"^\(?(\d+)\)?", para_text)
-    if match:
-        para_number = int(match.group(1))
-        json_data["paragraphs"].append({
-            "paragraph": para_number,
-            "content": para_text
-        })
+results = search_similar_text(query, top_k=3)
+print(f"Query: {query}")
+print("Top 3 Similar Texts:")
+for i, result in enumerate(results, 1):
+    print(f"{i}. {result}")
 
-# Save the JSON data to a file
-with open("article_data.json", "w", encoding="utf-8") as json_file:
-    json.dump(json_data, json_file, indent=4, ensure_ascii=False)
-
-print("Data has been successfully extracted and saved to article_data.json")
+conn.close()
