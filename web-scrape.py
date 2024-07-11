@@ -91,8 +91,13 @@ if div_tag:
 # Save the data to a JSON file
 output_file = 'data/ai_article_data.json'
 with open(output_file, 'w', encoding='utf-8') as json_file:
-    for obj in json_objects:
+    json_file.write("[\n")  # Add opening bracket and newline
+
+    for i, obj in enumerate(json_objects):
         json.dump(obj, json_file, indent=4, ensure_ascii=False)
+        if i < len(json_objects) - 1:
+            json_file.write(",\n")  # Add comma and newline for all objects except the last one
+
+    json_file.write("\n]")  # Add closing bracket and newline
 
 print(f'Data has been saved to {output_file}')
-
