@@ -24,3 +24,5 @@ We stored the vector data into a faiss database [vector_index.faiss].
 ### Retrieval demo
 In [retrieval.py] user modifies the `query` variable, to get the desired blocks (Articles). Here we first assign the correct ids for the articles, and then retrieve those from the [blocks.db] database.
 If an error occurs while retrieving (so that the id is not found), we return the error. 
+
+### Test
