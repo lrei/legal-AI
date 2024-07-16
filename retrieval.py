@@ -5,12 +5,12 @@ import faiss
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
-conn = sqlite3.connect('data/blocks.db')
+conn = sqlite3.connect('ijs/data/blocks.db')
 c = conn.cursor()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-index = faiss.read_index('data/vector_index.faiss')
+index = faiss.read_index('ijs/data/vector_index.faiss')
 
 def search_similar_text(query_text, top_k=5):
     query_vector = model.encode([query_text])[0]
