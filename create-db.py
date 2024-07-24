@@ -1,15 +1,13 @@
 import sqlite3
 import json
 
-# Step 1: Read the JSON file
+
 with open('data/ai_article_data.json', 'r', encoding='utf-8') as f:
     blocks = json.load(f)
 
-# Step 2: Connect to SQLite database (create new if not exists)
 conn = sqlite3.connect('data/blocks.db')
 c = conn.cursor()
 
-# Step 3: Create a table to store text blocks (if not exists)
 c.execute('''
 CREATE TABLE IF NOT EXISTS blocks (
     id INTEGER PRIMARY KEY,
@@ -22,7 +20,7 @@ CREATE TABLE IF NOT EXISTS blocks (
 )
 ''')
 
-# Step 4: Insert data into the table
+
 for block in blocks:
     chapter = block['Chapter']
     article = block['Article']
@@ -32,7 +30,7 @@ for block in blocks:
     text = block['Text']
     c.execute('INSERT INTO blocks (chapter, article, date, summary, paragraph, text) VALUES (?, ?, ?, ?, ?, ?)', (chapter, article, date, summary, paragraph, text))
 
-# Commit changes and close connection
+
 conn.commit()
 conn.close()
 

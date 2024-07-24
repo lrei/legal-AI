@@ -1,15 +1,19 @@
 from sentence_transformers import SentenceTransformer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import sqlite3
 import faiss
 import numpy as np
 
 
 
-
-conn = sqlite3.connect('ijs/data/blocks.db')
+conn = sqlite3.connect('data/blocks.db')
 c = conn.cursor()
 
-model = SentenceTransformer('all-MiniLM-L6-v2') # lahko kasneje damo tudi kakšnega drugega
+
+
+model_name = 'nlpaueb/legal-bert-base-uncased'
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name) # lahko kasneje damo tudi kakšnega drugega
 
 c.execute('SELECT id, text FROM blocks')
 rows = c.fetchall()
