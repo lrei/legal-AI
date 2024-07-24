@@ -40,8 +40,11 @@ def extract_summary(soup):
 # TODO: maybe put this into function, and then just loop in __main__? 
 # Also fix so that it doesn't save the html file locally, and works with online resource instead
 output_file = 'data/ai_article_data.json'
+with open(output_file, 'w', encoding='utf-8') as json_file:
+    json_file.write('')
 
-for art in range(5, 8):
+
+for art in range(1, 5):
 
     url = "https://artificialintelligenceact.eu/article/" + str(art) + "/"
 
@@ -108,14 +111,12 @@ for art in range(5, 8):
 
     # -----------------
 
-    with open(output_file, 'w', encoding='utf-8') as json_file:
-        json_file.write("[\n")  
+    with open(output_file, 'a', encoding='utf-8') as json_file:
+        json_file.write(",\n")  
 
         for i, obj in enumerate(json_objects):
             json.dump(obj, json_file, indent=4, ensure_ascii=False)
             if i < len(json_objects) - 1:
                 json_file.write(",\n")  
 
-        json_file.write("\n]")  
-
-    print(f'Data from article {art} has been saved to {output_file}')
+    print(f'Data from article {art} has been added to {output_file}')
