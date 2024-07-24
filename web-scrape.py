@@ -9,12 +9,16 @@ def extract_chapter_article(soup, number):
         article = h1_tag.text.strip()
     else:
         article = "Article not found"
-    
-    p_tag = soup.find('p', string=lambda text: text and 'Part of' in text)
-    if p_tag and p_tag.find('a'):
-        chapter = p_tag.find('a').text.strip()
-    else:
-        chapter = "Chapter not found"
+    p_tags = soup.find_all('p')
+    for p_tag in p_tags:
+        if 'Part of' in p_tag.get_text():
+            a_tag = p_tag.find('a')
+            if a_tag:
+                # Extract and return the text of the <a> tag
+                chapter = a_tag.get_text(strip=True)
+        else:
+            chapter = "Chapter not found"
+        
     
     return chapter, article
 
@@ -39,12 +43,14 @@ def extract_summary(soup):
 # ----------------- Begin iteration for every Article #n -----------------
 # TODO: maybe put this into function, and then just loop in __main__? 
 # Also fix so that it doesn't save the html file locally, and works with online resource instead
+# BUG: Articles that have only 1 paragraph are not numbered, therefore not included in the json. Example: Article 16
+
 output_file = 'data/ai_article_data.json'
 with open(output_file, 'w', encoding='utf-8') as json_file:
-    json_file.write('')
+    json_file.write('[\n')
 
 
-for art in range(1, 5):
+for art in range(1, 113):
 
     url = "https://artificialintelligenceact.eu/article/" + str(art) + "/"
 
@@ -120,3 +126,4 @@ for art in range(1, 5):
                 json_file.write(",\n")  
 
     print(f'Data from article {art} has been added to {output_file}')
+json_file.write('\n]')  # Close the JSON array

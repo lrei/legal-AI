@@ -2,7 +2,10 @@
 # Work-progress
 ## Data preparation
 ### Splitting docs
-We have written a webscraper using [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) from bs4that retrieves relevant articles from the [EU AI Act explorer](https://artificialintelligenceact.eu/ai-act-explorer/). For each article we extract its chapter, the date it will become relevant and the summary of the article. We then split each article further into paragraphs, retaining the data extracted above. 
+We have written a webscraper using [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) that retrieves relevant articles from the [EU AI Act explorer](https://artificialintelligenceact.eu/ai-act-explorer/). For each article we extract its chapter, the date it will become relevant and the summary of the article. We then split each article further into paragraphs, retaining the data extracted above. 
+
+TODO: maybe put this into function, and then just loop in __main__? 
+Also fix so that it doesn't save the html file locally, and works with online resource instead
 
 ### Converting into json
 The format is:
