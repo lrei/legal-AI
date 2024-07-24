@@ -1,3 +1,6 @@
+# Deprecated
+# Use web-scrape.py instead
+"""
 import requests
 import re
 import fitz  # PyMuPDF
@@ -61,18 +64,10 @@ def split(text):
 def generate_json(sections):
     print("Pritning from generate_json function")
     print(sections[34])
-    return 0
-
-    # Generating JSON
-    with open(sections_path, 'r', encoding='utf-8') as file:
-        content = file.read()
-
-    blocks = content.split('\n---\n')
-    # creating a list of JSON objects
     objects = []
-    for pos, block in enumerate(blocks):
+    for pos, section in enumerate(sections):
         object = {
-            "text": block,
+            "text": section,
             "position": pos
         }
         objects.append(object)
@@ -86,4 +81,4 @@ def generate_json(sections):
 if __name__ == "__main__":
     text = extract_text_from_pdf(pdf_path)
     generate_json(split(text))
-
+"""
