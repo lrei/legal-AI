@@ -1,59 +1,91 @@
 import sqlite3
+import warnings
+from elasticsearch import Elasticsearch, helpers
+from sentence_transformers import SentenceTransformer, util
 import numpy as np
-import faiss
-from transformers import AutoTokenizer, AutoModel
-import torch
 
-# Load the model and tokenizer
-model_name = 'nlpaueb/legal-bert-base-uncased'
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModel.from_pretrained(model_name)
-
-# Connect to the database
+# Database connection
 conn = sqlite3.connect('data/blocks.db')
 c = conn.cursor()
+c.execute('SELECT id, chapter, article, summary, text FROM blocks')
+rows = c.fetchall()
 
-c.execute('SELECT id, chapter, article, date, summary, paragraph, text FROM blocks')
-records = c.fetchall()
+warnings.filterwarnings('ignore', category=Warning)
 
-conn.close()
+es = Elasticsearch(
+    hosts=["http://localhost:9200"],
+    verify_certs=False  # Disable certificate verification (for development only)
+)
+index_name = 'documents'
+if es.indices.exists(index=index_name):
+    es.indices.delete(index=index_name)
+es.indices.create(index=index_name)
 
-vectors = []
-for record in records:
-    concatenated_text = ' | '.join(record[1:])  # brez id
-    inputs = tokenizer(concatenated_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
-    with torch.no_grad():
-        outputs = model(**inputs)
-        embeddings = outputs.last_hidden_state.mean(dim=1)
-        vectors.append(embeddings.squeeze().numpy())
+# Initialize SentenceTransformer model
+model = SentenceTransformer('BAAI/bge-base-en-v1.5')
 
-# Convert list of numpy arrays to a single numpy array
-vectors_np = np.vstack(vectors)
+# Index documents in Elasticsearch
+actions = []
+for row in rows:
+    doc = {
+        '_index': index_name,
+        '_id': row[0],
+        '_source': {
+            'chapter': row[1],
+            'article': row[2],
+            'summary': row[3],
+            'text': row[4]
+        }
+    }
+    actions.append(doc)
+helpers.bulk(es, actions)
 
-# Create a FAISS index and add the vectors
-index = faiss.IndexFlatL2(vectors_np.shape[1])
-index.add(vectors_np)
+print("Fetch and normalize corpus embeddings")
+corpus = [row[4] for row in rows]
+corpus_embeddings = model.encode(corpus, convert_to_tensor=True)
 
-# Save the index
-faiss.write_index(index, 'data/vector_index.faiss')
-print('Index saved to data/vector_index.faiss')
 
-# Load the FAISS index
-index = faiss.read_index('data/vector_index.faiss')
 
-# Prepare the query
-query_text = "Businesses must comply with the GDPR"
-inputs = tokenizer(query_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
-with torch.no_grad():
-    outputs = model(**inputs)
-    query_vector = outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
+corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
+print("Corpus embeddings normalized")
 
-# Search the index
-k = 5  # Number of nearest neighbors to find
-D, I = index.search(np.array([query_vector]), k)  # D: distances, I: indices
+def search_and_rerank(query, top_k=64, rerank_k=32):
+    print("search_and_rerank()")
+    query_embedding = model.encode(query, convert_to_tensor=True)
 
-# Process the results
-print("Indices of the most similar vectors:", I)
-print("Distances:", D)
-number_of_vectors = len(records)
-print("number_of_vectors:", number_of_vectors)
+     # Ensure the query_embedding is a 2D tensor
+    if query_embedding.dim() == 1:
+        query_embedding = query_embedding.unsqueeze(0)
+
+    query_embedding = util.normalize_embeddings(query_embedding)
+
+    print("Initial search with Elasticsearch")
+    search_results = es.search(
+        index=index_name,
+        body={
+            'query': {
+                'multi_match': {
+                    'query': query,
+                    'fields': ['chapter', 'article', 'summary', 'text']
+                }
+            },
+            'size': top_k
+        }
+    )
+
+    print("Extract document IDs and fetch embeddings for the top_k results")
+    top_k_docs = [hit['_id'] for hit in search_results['hits']['hits']]
+    top_k_embeddings = np.array([corpus_embeddings[int(doc_id)] for doc_id in top_k_docs])
+
+    print("Re-rank using semantic search")
+    hits = util.semantic_search(query_embedding, top_k_embeddings, top_k=rerank_k, score_function=util.dot_score)
+    
+    print("Retrieve and return re-ranked documents")
+    reranked_docs = [rows[int(top_k_docs[hit['corpus_id']])] for hit in hits[0]]
+    return reranked_docs
+
+# Example usage
+query = "Risk management"
+results = search_and_rerank(query)
+for result in results:
+    print(result)
