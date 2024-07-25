@@ -4,6 +4,9 @@ from elasticsearch import Elasticsearch, helpers
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
 
+# BUG: every section is saved 3 times, each time 500 indices apart. Fix this.
+
+
 # Database connection
 conn = sqlite3.connect('data/blocks.db')
 c = conn.cursor()
@@ -85,7 +88,9 @@ def search_and_rerank(query, top_k=64, rerank_k=32):
     return reranked_docs
 
 # Example usage
-query = "Risk management"
+query = "Personal use of AI"
 results = search_and_rerank(query)
+print("Number of results: ", len(results))
 for result in results:
     print(result)
+    print("\n")
