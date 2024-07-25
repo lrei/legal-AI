@@ -1,4 +1,4 @@
-# AI Legal Text Processing and Analysis Workflow
+# AI Legal Assistant
 
 This document outlines the workflow for processing and analyzing AI-related legal texts, consisting of three main stages: web scraping, database creation, and vector encoding with semantic search. Special attention is given to the vector encoding process, which enhances search capabilities.
 
