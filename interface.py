@@ -1,6 +1,6 @@
-import openai
+# import openai
 import subprocess
-
+"""
 openai.api_key = 'your-openai-api-key'
 
 def get_chatgpt_response(prompt):
@@ -10,7 +10,7 @@ def get_chatgpt_response(prompt):
         max_tokens=150
     )
     return response.choices[0].text.strip()
-
+"""
 def retrieve_chunks(query_text):
     result = subprocess.run(['python', 'vec-encoding.py', query_text], capture_output=True, text=True)
     return result.stdout.strip().split('\n')
@@ -28,10 +28,10 @@ def main():
     print("\nConstructed Prompt:")
     print(prompt)
     
-    response = get_chatgpt_response(prompt)
+    # response = get_chatgpt_response(prompt)
     
     print("\nResponse from ChatGPT:")
-    print(response)
+    # print(response)
 
 if __name__ == "__main__":
     main()

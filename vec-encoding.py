@@ -5,7 +5,6 @@ from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import sys
 
-# BUG: every section is saved 3 times, each time 500 indices apart. Fix this.
 
 es = None
 model = None

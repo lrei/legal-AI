@@ -1,5 +1,6 @@
-# Testing the retrieval from faiss
-# Demo
+# The document is not relevant anymore, since we switched to a different approach for retrieval (elastic search)
+# See vec-encoding.py
+
 import sqlite3
 import faiss
 from sentence_transformers import SentenceTransformer

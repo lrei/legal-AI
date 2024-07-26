@@ -44,9 +44,10 @@ paragraph = 2  # Example paragraph to retrieve
 c.execute('SELECT * FROM blocks WHERE paragraph = ?', (paragraph,))
 rows = c.fetchall()
 
-print(f"Text blocks with position {paragraph}:")
+# print(f"Text blocks with position {paragraph}:") # 467 
 
 row = rows[0]
+print("LEN ROWS: ", len(rows))
 text = row[2]
 print(f"ID: {row[0]},  {row[1]}, {row[2]}, paragraph, {row[5]}, Text: {row[6]}")
 
