@@ -3,54 +3,61 @@ import warnings
 from elasticsearch import Elasticsearch, helpers
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
+import sys
 
 # BUG: every section is saved 3 times, each time 500 indices apart. Fix this.
 
-
-# Database connection
-conn = sqlite3.connect('data/blocks.db')
-c = conn.cursor()
-c.execute('SELECT id, chapter, article, summary, text FROM blocks')
-rows = c.fetchall()
-
-warnings.filterwarnings('ignore', category=Warning)
-
-es = Elasticsearch(
-    hosts=["http://localhost:9200"],
-    verify_certs=False  # Disable certificate verification (for development only)
-)
+es = None
+model = None
 index_name = 'documents'
-if es.indices.exists(index=index_name):
-    es.indices.delete(index=index_name)
-es.indices.create(index=index_name)
+corpus_embeddings = None
+corpus = []
+rows = []
 
-# Initialize SentenceTransformer model
-model = SentenceTransformer('BAAI/bge-base-en-v1.5')
+def setup():
+    global es, model, corpus_embeddings, corpus, rows
 
-# Index documents in Elasticsearch
-actions = []
-for row in rows:
-    doc = {
-        '_index': index_name,
-        '_id': row[0],
-        '_source': {
-            'chapter': row[1],
-            'article': row[2],
-            'summary': row[3],
-            'text': row[4]
+    conn = sqlite3.connect('data/blocks.db')
+    c = conn.cursor()
+    c.execute('SELECT id, chapter, article, summary, text FROM blocks')
+    rows = c.fetchall()
+
+    warnings.filterwarnings('ignore', category=Warning)
+
+    es = Elasticsearch(
+        hosts=["http://localhost:9200"],
+        verify_certs=False  # Disable certificate verification (for development only)
+    )
+    index_name = 'documents'
+    if es.indices.exists(index=index_name):
+        es.indices.delete(index=index_name)
+    es.indices.create(index=index_name)
+
+    model = SentenceTransformer('BAAI/bge-base-en-v1.5')
+
+    actions = []
+    for row in rows:
+        doc = {
+            '_index': index_name,
+            '_id': row[0],
+            '_source': {
+                'chapter': row[1],
+                'article': row[2],
+                'summary': row[3],
+                'text': row[4]
+            }
         }
-    }
-    actions.append(doc)
-helpers.bulk(es, actions)
+        actions.append(doc)
+    helpers.bulk(es, actions)
 
-print("Fetch and normalize corpus embeddings")
-corpus = [row[4] for row in rows]
-corpus_embeddings = model.encode(corpus, convert_to_tensor=True)
-
+    print("Fetch and normalize corpus embeddings")
+    corpus = [row[4] for row in rows]
+    corpus_embeddings = model.encode(corpus, convert_to_tensor=True)
 
 
-corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
-print("Corpus embeddings normalized")
+
+    corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
+    print("Corpus embeddings normalized")
 
 def search_and_rerank(query, top_k=64, rerank_k=32):
     print("search_and_rerank()")
@@ -87,6 +94,7 @@ def search_and_rerank(query, top_k=64, rerank_k=32):
     reranked_docs = [rows[int(top_k_docs[hit['corpus_id']])] for hit in hits[0]]
     return reranked_docs
 
+"""
 # Example usage
 query = "Personal use of AI"
 results = search_and_rerank(query)
@@ -94,3 +102,19 @@ print("Number of results: ", len(results))
 for result in results:
     print(result)
     print("\n")
+"""
+
+def main(query_text):
+    setup()  # Initialize resources
+    results = search_and_rerank(query_text)
+    
+    # Print the results in a format suitable for the other script
+    for result in results:
+        print(result)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        query_text = sys.argv[1]
+        main(query_text)
+    else:
+        print("No query text provided.")
