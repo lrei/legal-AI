@@ -19,6 +19,7 @@ The ([`web-scrape.py`](https://github.com/makov3c/ijs/blob/main/web-scrape.py)) 
 ### TODO
 - **Optimization**: Direct parsing from the response object could be more efficient.
 - **Single Paragraph Handling**: Requires special processing (e.g. Article 16)
+- Chapter titles are not fetched properly
 
 ## 2. Storing into a database
 
