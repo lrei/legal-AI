@@ -42,5 +42,21 @@ When a search query is issued, the script starts by encoding the query into a ve
 
 Finally, the script retrieves and displays the re-ranked documents, providing results that are more contextually relevant and semantically aligned with the query. This approach ensures that the search results reflect the true meaning behind the query, offering more accurate and meaningful information.
 
-### TODO
-- **Tripled answers**: The answers displayes are always in triplets, each exactly 500 indices apart from eachother. There might be an error while storing them in the database or json, or there is an error reading from the db.
+### Usage
+If you only want to get the relevant acts, witout the use of LLMs, provide a query text as a command-line argument:
+```python
+python vec-encoding.py "AI Legalisation and Documentation keeping"
+```
+
+## 4. LLM Integration
+
+This script integrates OpenAI's ChatGPT to generate responses that are both relevant and contextually accurate, based on user queries and additional information retrieved through a vector encoding process. It automates the interaction with the ChatGPT API, extracts relevant textual data through a subprocess, and combines these elements to produce a well-formed response.
+
+ It handles the sequence of processing user queries by first capturing the input, running an external script [`vec-encoding.py`](https://github.com/makov3c/ijs/blob/main/vec-encoding.py) to fetch relevant text chunks, and assembling a detailed prompt incorporating the user's query and the retrieved context. This prompt is then sent to the ChatGPT model to generate a response. The script concludes by displaying the constructed prompt and the generated response, providing both for review.
+
+#### Usage
+To use the Assistant, execute [`interface.py`](https://github.com/makov3c/ijs/blob/main/interface.py) from the command line and input the question yu have about the EU AI act.
+
+```
+python interface.py
+```
