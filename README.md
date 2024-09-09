@@ -75,3 +75,6 @@ python app.py
 ```
 
 Open your web browser and navigate to `http://127.0.0.1:5000/`. Write your query in the query interface and click enter. The answers will be displayed shortly. 
+
+![slika](https://github.com/user-attachments/assets/17fcf71e-a561-4202-889b-ec0baa1e947f)
+
