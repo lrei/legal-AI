@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Interface</title>
+</head>
+<body>
+    <h1>Query Interface</h1>
+    <form action="/query" method="post">
+        <label for="query">Enter your query:</label>
+        <input type="text" id="query" name="query" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if user_query %}
+        <h2>Constructed Prompt:</h2>
+        <pre>{{ prompt }}</pre>
+
+        <h2>Relevant Chunks:</h2>
+        <ul>
+            {% for chunk in relevant_chunks %}
+                <li>{{ chunk }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
