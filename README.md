@@ -63,9 +63,15 @@ This script integrates OpenAI's ChatGPT to generate responses that are both rele
 
  It handles the sequence of processing user queries by first capturing the input, running an external script [`vec-encoding.py`](https://github.com/makov3c/ijs/blob/main/vec-encoding.py) to fetch relevant text chunks, and assembling a detailed prompt incorporating the user's query and the retrieved context. This prompt is then sent to the ChatGPT model to generate a response. The script concludes by displaying the constructed prompt and the generated response, providing both for review.
 
-#### Usage
-To use the Assistant, execute [`interface.py`](https://github.com/makov3c/ijs/blob/main/interface.py) from the command line and input the question yu have about the EU AI act.
+## Running application locally
+First, install Flask (if its not already installed) using pip
+```python
+pip install flask
+```
 
+Then run the application with command
+```python
+python app.py
 ```
-python interface.py
-```
+
+Open your web browser and navigate to `http://127.0.0.1:5000/`. Write your query in the query interface and click enter. The answers will be displayed shortly. 

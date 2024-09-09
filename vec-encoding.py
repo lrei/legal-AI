@@ -91,7 +91,7 @@ def search_and_rerank(query, top_k=64, rerank_k=32):
     
     print("Retrieve and return re-ranked documents")
     reranked_docs = [rows[int(top_k_docs[hit['corpus_id']])] for hit in hits[0]]
-    return reranked_docs
+    return reranked_docs[:3]
 
 """
 # Example usage
