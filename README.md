@@ -39,6 +39,14 @@ First, the script connects to an SQLite database and extracts legal text documen
 
 The core of the script is the use of the BAAI/bge-base-en-v1.5 model from SentenceTransformers. This model is utilized to convert the documents into high-dimensional vectors, capturing their semantic content. The script then normalizes these embeddings to ensure consistency in the vector space.
 
+#### Setting up Elasticsearch locally
+Download Ellasticsearch and run this command in cmd:
+```
+bin\elasticsearch.bat
+```
+You can check if Elasticsearch cluster is running by visiting `http://localhost:9200` where you should see a JSON response.
+
+#### How it works
 When a search query is issued, the script starts by encoding the query into a vector. It performs an initial search using Elasticsearch, which retrieves documents based on keyword matches. The script then refines these results by comparing the query vector to the vectors of the top retrieved documents. This process involves re-ranking the documents using semantic similarity, rather than just keyword frequency.
 
 Finally, the script retrieves and displays the re-ranked documents, providing results that are more contextually relevant and semantically aligned with the query. This approach ensures that the search results reflect the true meaning behind the query, offering more accurate and meaningful information.
