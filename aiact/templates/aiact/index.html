@@ -1,0 +1,9 @@
+{% if previous_articles %}
+    <ul>
+    {% for article in previous_articles %}
+        <li><a href="{% url 'detail' article.id %}">{{ article.articleTitle }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>aiAct is not available.</p>
+{% endif %}
