@@ -111,6 +111,7 @@ The Flask web application (`app.py`) provides the user interface and handles use
   - Used to parse scraped data into structured passages.
 
 - **Embedding and Storage Script**: `create_sql_and_store_embeddings.py` is an interactive file that:
+  - Merges JSON files.
   - Generates embeddings for passages.
   - Stores embeddings in LanceDB and metadata in SQLite databases.
   - Deletes old LanceDB files before creating new ones to optimize storage.

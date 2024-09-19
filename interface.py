@@ -13,7 +13,7 @@ def get_chatgpt_response(prompt):
 
 def retrieve_chunks(query_text):
     result = subprocess.run(['python', 'retrieving_articles.py', query_text], capture_output=True, text=True)
-    return result.stdout.strip().split('-----\n')  # Split by the separator used in compliance_expert.py
+    return result.stdout.strip().split('-----\n')
 
 def main():
     user_query = input("Enter your query: ")
