@@ -138,6 +138,15 @@ Install required package using pip:
 ```bash
 pip install flask 
 ```
+### c. Clone the repository locally
+- Clone the repository from GitHub:
+```bash
+git clone https://github.com/makov3c/legal-AI.git
+```
+  - Navigate to the cloned repository:
+  ```bash
+  cd legal-AI
+  ```
 
 ## Usage Instructions
 
