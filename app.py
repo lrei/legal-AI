@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template
 import subprocess
 
 app = Flask(__name__)
 
 def retrieve_chunks(query_text):
-    result = subprocess.run(['python', 'vec-encoding.py', query_text], capture_output=True, text=True)
-    return result.stdout.strip().split('\n')
+    result = subprocess.run(['python', 'retrieving_articles.py', query_text], capture_output=True, text=True)
+    return result.stdout.strip().split('-----\n')  # Split by the separator used in compliance_expert.py
 
 @app.route('/')
 def index():

@@ -1,18 +1,19 @@
-# import openai
+import openai
 import subprocess
+
 openai.api_key = 'your-openai-api-key'
 
 def get_chatgpt_response(prompt):
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo",
         prompt=prompt,
         max_tokens=150
     )
     return response.choices[0].text.strip()
 
 def retrieve_chunks(query_text):
-    result = subprocess.run(['python', 'vec-encoding.py', query_text], capture_output=True, text=True)
-    return result.stdout.strip().split('\n')
+    result = subprocess.run(['python', 'retrieving_articles.py', query_text], capture_output=True, text=True)
+    return result.stdout.strip().split('-----\n')  # Split by the separator used in compliance_expert.py
 
 def main():
     user_query = input("Enter your query: ")

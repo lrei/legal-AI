@@ -1,80 +1,154 @@
+
 # AI Legal Assistant
 
-This document outlines the workflow for processing and analyzing AI-related legal texts, consisting of three main stages: web scraping, database creation, and vector encoding with semantic search. Special attention is given to the vector encoding process, which enhances search capabilities.
+This project focuses on processing and analyzing legal texts related to AI regulations such as the GDPR, the European Data Act, the European Artificial Intelligence Act, and the European Data Governance Act.
 
-## 1. Web Scraping 
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Project Workflow](#project-workflow)
+   - [1. Data Collection](#1-data-collection)
+   - [2. Embedding Generation and Data Storage](#2-embedding-generation-and-data-storage)
+   - [3. Article Retrieval Process](#3-article-retrieval-process)
+   - [4. Web Application](#4-web-application)
+3. [Scripts and Utilities](#scripts-and-utilities)
+4. [Dependencies and Installation](#dependencies-and-installation)
+5. [Usage Instructions](#usage-instructions)
 
-### Overview
-The ([`web-scrape.py`](https://github.com/makov3c/ijs/blob/main/web-scrape.py)) script extracts AI-related legal texts from a website. It gathers articles, chapters, enforcement dates, summaries, and paragraph texts.
+## Project Overview
+The AI Legal Assistant aims to facilitate easy access to complex legal documents related to AI regulations. By leveraging natural language processing and vector embeddings, users can query the system in plain language and retrieve the most relevant legal articles.
 
-### Workflow
-1. **Requesting Pages**: Sends HTTP GET requests for each article.
-2. **Parsing HTML**: Uses BeautifulSoup to extract relevant data.
-3. **Extracting Data**:
-   - **Chapter and Article**: From `<h1>` and specific paragraphs.
-   - **Expected Date and Summary**: From designated paragraph classes.
-   - **Paragraph Texts**: Using regex for numbered paragraphs.
-4. **Storing Data**: Saves extracted data in [`data/ai_article_data.json`](https://github.com/makov3c/ijs/blob/main/data/ai_article_data.json).
+## Project Workflow
 
-### TODO
-- **Optimization**: Direct parsing from the response object could be more efficient.
-- **Single Paragraph Handling**: Requires special processing (e.g. Article 16)
-- Chapter titles are not fetched properly
+### 1. Data Collection
 
-## 2. Storing into a database
+#### a. Web Scraping
+The initial step involves scraping official websites or repositories to collect the full text of each of the four regulations. Each regulation has its own subfolder within the `data` directory (e.g., `data/AI_Act`, `data/GDPR`). Within each subfolder:
 
-### Overview
-The [`create-db.py`](https://github.com/makov3c/ijs/blob/main/create-db.py) script creates and populates a SQLite database ([`data/blocks.db`](https://github.com/makov3c/ijs/blob/main/data/blocks.db) with the scraped data. This will later be useful for converting into vector form.
+- **Scraping Scripts**: Scripts like `scrape_ai_act.py` are used to download and extract the text of the regulations.
+- **Output Data**: The scraped data is saved as JSON files, maintaining the hierarchical structure of the regulations.
 
-Imports data from the JSON file and creates a SQLite database with a `blocks` table for storing data. Then it inserts chapter, article title, expected date of going into force, article summary and the number of the paragraph along with the relevant text.
+#### b. Parsing and Structuring the Data
+After scraping, the legal texts are parsed into smaller, manageable passages:
 
-The article title, along with summary and the expected date of the enforcement is duplicated with each paragraph, that belongs to the same article.
+- **Passage Length and Overlap**: Passages are created with a defined length and overlap to ensure context is preserved across passages.
+- **Structured Data**: Each passage includes metadata such as regulation name, chapter, article, passage number, and content.
+- **Data Storage**: The structured passages are saved as JSON files for each regulation.
 
-## 3. Vector Encoding and Semantic Search
+### 2. Embedding Generation and Data Storage
 
-### Overview
-The [`vec-encoding.py`](https://github.com/makov3c/ijs/blob/main/vec-encoding.py) script performs vector encoding and semantic search, converting text into high-dimensional vectors for advanced search functionalities.
+#### a. Generating Embeddings
+Each passage is encoded into a high-dimensional vector (embedding) using a pre-trained language model:
 
-First, the script connects to an SQLite database and extracts legal text documents, which are then indexed in Elasticsearch. This involves setting up an Elasticsearch index named documents, where each document from the database is formatted and uploaded in bulk.
+- **Model Used**: `BAAI/bge-small-en`, suitable for generating embeddings that capture semantic meaning.
+- **Process**:
+  - **Tokenization**: Passages are tokenized using the model's tokenizer.
+  - **Embedding**: Tokens are passed through the model to obtain embeddings.
+- **Normalization**: Embeddings are normalized to unit length to facilitate accurate similarity calculations.
 
-The core of the script is the use of the BAAI/bge-base-en-v1.5 model from SentenceTransformers. This model is utilized to convert the documents into high-dimensional vectors, capturing their semantic content. The script then normalizes these embeddings to ensure consistency in the vector space.
+#### b. Storing Embeddings and Metadata
+To optimize storage and retrieval efficiency, embeddings and metadata are stored separately:
 
-#### Setting up Elasticsearch locally
-Download Ellasticsearch and run this command in cmd:
+- **Embeddings in LanceDB**:
+  - Only the `id` (unique identifier) and the embedding vector are stored.
+  - LanceDB is a vector database optimized for efficient similarity searches.
+- **Metadata in SQLite Database**:
+  - Metadata such as regulation, chapter, article, passage, and content are stored.
+  - This separation allows efficient vector searches while keeping detailed metadata accessible.
+
+**Process Flow**:
+
+1. **Insert Metadata**: Passages are inserted into the SQLite database, which assigns an `id` to each entry.
+2. **Store Embeddings**: Corresponding embeddings, along with their `id`s, are stored in LanceDB.
+
+### 3. Article Retrieval Process
+
+When a user submits a query through the web interface, the system retrieves the most relevant articles through the following steps:
+
+#### a. Query Embedding Generation
+- The user's query is processed using the same pre-trained language model to generate an embedding.
+- This embedding represents the semantic content of the query.
+
+#### b. Similarity Search in LanceDB
+- **Similarity Calculation**: The query embedding is compared against stored passage embeddings using cosine similarity.
+- **Retrieving Top Matches**: The system retrieves the top 5 embeddings most similar to the query.
+
+#### d. Article Reconstruction
+- **Combining Passages**:
+  - Passages belonging to the same article are combined to reconstruct the full article text.
+  - Overlaps are handled to avoid duplication while preserving context.
+
+
+#### e. Presenting the Results
+- **Ranking**:
+  - Results are ranked based on similarity scores.
+- **Displaying Information**:
+  - For each relevant article, the system displays:
+    - Regulation Name
+    - Chapter
+    - Article Number and Title
+    - Full Content
+- **User Interface**:
+  - Results are presented in a user-friendly format on the web interface.
+
+### 4. Web Application
+
+The Flask web application (`app.py`) provides the user interface and handles user interactions.
+
+#### a. User Interaction
+- **Query Input**: Users input their queries through a web form.
+- **Results Display**: The app displays top relevant articles along with detailed information.
+
+#### b. Application Workflow
+1. **Receive Query**: The app receives the user's query from the web form.
+2. **Process Query**: It calls the retrieval script to process the query and retrieve relevant articles.
+3. **Render Results**: The app renders results on the web page, including constructed prompts, relevant information, and relevant chunks.
+
+## Scripts and Utilities
+
+- **Data Scraping and Parsing Scripts**:
+  - Located in each regulation's subfolder within the `data` directory.
+  - Responsible for downloading and extracting legal texts.
+  - Used to parse scraped data into structured passages.
+
+- **Embedding and Storage Script**: `create_sql_and_store_embeddings.py` is an interactive file that:
+  - Generates embeddings for passages.
+  - Stores embeddings in LanceDB and metadata in SQLite databases.
+  - Deletes old LanceDB files before creating new ones to optimize storage.
+
+- **Article Retrieval Script**: `retrieving_articles.py`
+  - Processes user queries.
+  - Performs similarity searches in LanceDB.
+  - Retrieves and reconstructs relevant articles using the SQLite database.
+
+- **Web Application Script**: `app.py`
+  - Implements the Flask web application.
+  - Handles routes, user input, and rendering templates.
+
+## Dependencies and Installation
+
+### a. Python Version
+- Requires Python 3.7 or higher.
+
+### b. Required Packages
+- **Flask**: Web application framework.
+
+Install required package using pip:
+
+```bash
+pip install flask 
 ```
-bin\elasticsearch.bat
-```
-You can check if Elasticsearch cluster is running by visiting `http://localhost:9200` where you should see a JSON response.
 
-#### How it works
-When a search query is issued, the script starts by encoding the query into a vector. It performs an initial search using Elasticsearch, which retrieves documents based on keyword matches. The script then refines these results by comparing the query vector to the vectors of the top retrieved documents. This process involves re-ranking the documents using semantic similarity, rather than just keyword frequency.
+## Usage Instructions
 
-Finally, the script retrieves and displays the re-ranked documents, providing results that are more contextually relevant and semantically aligned with the query. This approach ensures that the search results reflect the true meaning behind the query, offering more accurate and meaningful information.
+1. **Start the Flask App**:
 
-### Usage
-If you only want to get the relevant acts, witout the use of LLMs, provide a query text as a command-line argument:
-```python
-python vec-encoding.py "AI Legalisation and Documentation keeping"
-```
-
-## 4. LLM Integration
-
-This script integrates OpenAI's ChatGPT to generate responses that are both relevant and contextually accurate, based on user queries and additional information retrieved through a vector encoding process. It automates the interaction with the ChatGPT API, extracts relevant textual data through a subprocess, and combines these elements to produce a well-formed response.
-
- It handles the sequence of processing user queries by first capturing the input, running an external script [`vec-encoding.py`](https://github.com/makov3c/ijs/blob/main/vec-encoding.py) to fetch relevant text chunks, and assembling a detailed prompt incorporating the user's query and the retrieved context. This prompt is then sent to the ChatGPT model to generate a response. The script concludes by displaying the constructed prompt and the generated response, providing both for review.
-
-## Running application locally
-First, install Flask (if its not already installed) using pip
-```python
-pip install flask
-```
-
-Then run the application with command
-```python
+```bash
 python app.py
 ```
 
-Open your web browser and navigate to `http://127.0.0.1:5000/`. Write your query in the query interface and click enter. The top 3 results will be displayed shortly. 
+2. **Access the Interface**:
+   - Open your web browser and go to `http://127.0.0.1:5000/`.
+   - Enter your query in the provided form.
 
-![slika](https://github.com/user-attachments/assets/17fcf71e-a561-4202-889b-ec0baa1e947f)
-
+3. **View Results**:
+   - After submitting your query, view the constructed prompt, relevant information, and relevant chunks on the results page.
