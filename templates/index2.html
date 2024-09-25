@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Legal Compliance Expert</title>
 </head>
 <body>
@@ -16,10 +15,12 @@
     {% if user_query %}
         <h2>Your Query:</h2>
         <p>{{ user_query }}</p>
-        
+
         <h2>Constructed Prompt:</h2>
         <pre>{{ prompt }}</pre>
-        
+
+        <h2>Response from ChatGPT:</h2>
+        <p>{{ response }}</p>
     {% endif %}
 </body>
 </html>
