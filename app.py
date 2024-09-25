@@ -24,7 +24,7 @@ def query():
     # Pre-defined prompt template
     prompt = (
         f"Consider the following articles of legislation, provided between triple backticks, "
-        f"and nothing else:\n\n```\n{context}\n```\n\n"
+        f"and nothing else:\n```\n{context}\n```\n\n"
         f"Under these articles and only these articles, and ignoring those that are not "
         f"applicable, as a legal compliance expert, answer: what are the implications of the "
         f"provided articles to the following legal matter, in triple backticks:\n"
