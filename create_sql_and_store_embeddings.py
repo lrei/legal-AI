@@ -40,6 +40,8 @@ def get_file_paths(choice):
         return None, None, None
     return json_file, db_file, lancedb_dir
 
+
+# Merging the 4 JSON files into a bigger one
 def merge_json_files():
     json_files = [
         'data/GDPR/gdpr.json',
@@ -63,12 +65,11 @@ def merge_json_files():
         json.dump(combined_data, f, indent=4, ensure_ascii=False)
 
     print(f"Combined {len(json_files)} JSON files into 'data/Merged/merged.json'")
-    print(f"Total number of sections: {total_sections}")
+
 
 def process_regulation(choice, tokenizer, model):
     json_file, db_file, lancedb_dir = get_file_paths(choice)
     if json_file is None:
-        print(f"Invalid regulation choice: {choice}. Skipping.")
         return
 
     if os.path.exists(lancedb_dir):
@@ -78,6 +79,8 @@ def process_regulation(choice, tokenizer, model):
     with open(json_file, 'r', encoding='utf-8') as f:
         paragraphs_data = json.load(f)
 
+
+# Creating thr SQL database
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
@@ -95,16 +98,16 @@ def process_regulation(choice, tokenizer, model):
         passage = entry['Passage']
         content = entry['Content']
 
-        # Embed the content
+        # Embed the metadata
         embedding = embed_paragraph(content, tokenizer, model)
         embedding = embedding / np.linalg.norm(embedding)
 
-        # Insert into SQLite database (without embedding)
+        # Insert into SQLite database (without the embedding)
         c.execute('INSERT INTO embeddings (regulation, chapter, article, passage, content) VALUES (?, ?, ?, ?, ?)',
                   (regulation, chapter, article, passage, content))
         id_value = c.lastrowid
 
-        # Prepare data for LanceDB (only id and vector)
+        # Prepare relevant data for LanceDB files (only id and vector!)
         lance_data.append({
             "id": id_value,
             "vector": embedding.tolist()
@@ -126,7 +129,6 @@ def process_regulation(choice, tokenizer, model):
 
     ldb.create_table(table_name, df, mode='overwrite')
 
-    print(f"\n[{choice.upper()}] All embeddings have been processed and stored.")
     print(f"[{choice.upper()}] Total embeddings processed: {total_embeddings}")
     print(f"[{choice.upper()}] LanceDB table '{table_name}' created with {total_embeddings} embeddings and saved to {lancedb_dir}.")
 
@@ -137,7 +139,6 @@ def main():
     elif merge_choice == 'no':
         pass  
     else:
-        print("Invalid choice. Exiting.")
         exit()
 
     choice = input("Which regulation would you like to process? (dga/eaa/gdpr/da/merged/all): ").lower()

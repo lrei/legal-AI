@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-# Manually set chapter titles with the correct range
+# Manually setting chapter and article titles
 chapter_mapping_manual = {
     range(1, 5): "Chapter I: General provisions",
     range(5, 12): "Chapter II: Principles",
@@ -18,7 +18,6 @@ chapter_mapping_manual = {
     range(94, 100): "Chapter XI: Final provisions"
 }
 
-# Manually set article titles
 article_titles_manual = {
     1: "Subject-matter and objectives",
     2: "Material scope",
@@ -160,20 +159,17 @@ def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
         start += 1
     return chunks
 
+# Handling special cases where a space is missing between two words due to a hyperlink
 def fix_missing_spaces(text):
     text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
     text = re.sub(r'(\d)([A-Za-z])', r'\1 \2', text)
     text = re.sub(r'([A-Za-z])(\d)', r'\1 \2', text)
     text = re.sub(r'(\d)\s*(to|and|or)\s*(\d)', r'\1 \2 \3', text)
-    
     return text
 
 def format_article_mentions(text):
-    """ Adjusts spacing around 'Article' or 'Articles' and numbers.
-    Fixes missing spaces in cases like 'inArticles', '12to15', etc. """
     text = fix_missing_spaces(text)
     text = re.sub(r'\b(Articles?)\s*(\d+)\b', r'\1 \2', text)
-    
     return text
 
 def process_br_tags(paragraph):

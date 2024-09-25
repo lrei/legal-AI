@@ -3,7 +3,7 @@ import json
 from bs4 import BeautifulSoup
 import requests
 
-# Function to split paragraph into overlapping chunks
+# Function to split paragraphs into overlapping chunks
 def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
     chunks = []
     start = 0
@@ -26,6 +26,7 @@ def clean_paragraph_text(paragraph):
         span.decompose() 
     return paragraph.get_text().strip()
 
+# Using roman numerals for chapter numbers
 def int_to_roman(n):
     roman_numerals = [
         ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),

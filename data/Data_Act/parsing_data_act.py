@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
+# Manually setting the chapter titles because it is easier
 chapter_mapping = {
     range(1, 3): "Chapter 1: General provisions",
     range(3, 8): "Chapter 2: Business to consumer and business to business data sharing",

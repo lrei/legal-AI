@@ -16,13 +16,7 @@
     {% if user_query %}
         <h2>Constructed Prompt:</h2>
         <pre>{{ prompt }}</pre>
-
-        <h2>Relevant Chunks:</h2>
-        <ul>
-            {% for chunk in relevant_chunks %}
-                <li>{{ chunk }}</li>
-            {% endfor %}
-        </ul>
+        
     {% endif %}
 </body>
 </html>

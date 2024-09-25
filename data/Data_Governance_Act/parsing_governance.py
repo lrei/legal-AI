@@ -15,6 +15,7 @@ chapter_mapping = {
     range(34, 39): "Chapter IX: Final and transitional provisions"
 }
 
+# Excluding some text that does not need to be scraped from the website
 exclude_sections = [
     "Understanding Cybersecurity in the European Union",
     "The NIS 2 Directive", "The European Cyber Resilience Act",
@@ -70,9 +71,11 @@ def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
         start += 1
     return chunks
 
+# Removing unwanted space
 def clean_extra_spaces_in_text(text):
     return re.sub(r'(\d+)\.\s+', r'\1. ', text)
 
+# Replacing apostrophes
 def replace_apostrophes(text):
     text = text.replace("‘", "'").replace("’", "' ")
     return text

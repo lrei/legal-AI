@@ -20,13 +20,15 @@ def query():
     user_query = request.form['query']
     relevant_chunks = retrieve_chunks(user_query)
     context = "\n".join(relevant_chunks)
+
+    # Pre-defined prompt template
     prompt = (
-        f"User Query: {user_query}\n\n"
         f"Consider the following articles of legislation, provided between triple backticks, "
         f"and nothing else:\n\n```\n{context}\n```\n\n"
         f"Under these articles and only these articles, and ignoring those that are not "
         f"applicable, as a legal compliance expert, answer: what are the implications of the "
-        f"provided articles to the original user query?\n"
+        f"provided articles to the following legal matter, in triple backticks:\n"
+        f"```\n{user_query}\n```\n"
         f"Answer article by article and don't provide any additional introduction or "
         f"conclusions.\nLet's think step by step."
     )

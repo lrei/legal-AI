@@ -19,10 +19,13 @@ def generate_bge_embedding(text, tokenizer, model):
         embedding = outputs.last_hidden_state.mean(dim=1).numpy().flatten()
     return normalize_embedding(embedding)
 
+
+# Cross indexing from .db files and LanceDB files
 def get_metadata_from_db(cursor, id_value):
     cursor.execute("SELECT regulation, chapter, article, passage, content FROM embeddings WHERE id = ?", (id_value,))
     return cursor.fetchone()
 
+# Getting rid of the overlapping passages to form a coherent article
 def get_full_article(cursor, regulation, article):
     cursor.execute("""
         SELECT passage, content 
@@ -39,9 +42,7 @@ def search_legislation_lance(query_text, query_embedding, table, cursor, reranke
     query_embedding = normalize_embedding(query_embedding.tolist())
     candidate_passages = []
     passage_metadata = []
-
     limit = initial_limit
-
     results = table.search(query_embedding).limit(limit).to_pandas()
 
     for index, row in results.iterrows():
@@ -49,6 +50,7 @@ def search_legislation_lance(query_text, query_embedding, table, cursor, reranke
         if metadata:
             regulation, chapter, article, passage, content = metadata
             
+            # Omit the articles titled "Definitions" because they provide no insight into the legal matter 
             if "definitions" in article.lower():
                 continue
             
@@ -121,13 +123,12 @@ def main():
         try:
             k = int(sys.argv[2]) if len(sys.argv) > 2 else 3  
         except ValueError:
-            print("Invalid value for k. Using default of 3.")
             k = 3
 
     ldb = lancedb.connect('lancedb_files/Merged')
     table = ldb.open_table('embeddings')  # LanceDB table
 
-    conn = sqlite3.connect('data/Merged/merged.db')
+    conn = sqlite3.connect('data/Merged/merged.db') # SQL database
     cursor = conn.cursor()
 
     # Load the BGE embedding model
