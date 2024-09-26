@@ -1,66 +1,56 @@
 
 # AI Legal Assistant
 
-This project focuses on processing and analyzing legal texts related to AI regulations such as the GDPR, the European Data Act, the European Artificial Intelligence Act, and the European Data Governance Act.
+## Introduction
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Project Workflow](#project-workflow)
-   - [1. Data Collection](#1-data-collection)
-   - [2. Embedding Generation and Data Storage](#2-embedding-generation-and-data-storage)
-   - [3. Article Retrieval Process](#3-article-retrieval-process)
-   - [4. Web Application](#4-web-application)
-3. [Scripts and Utilities](#scripts-and-utilities)
-4. [Dependencies and Installation](#dependencies-and-installation)
-5. [Usage Instructions](#usage-instructions)
-
-## Project Overview
-The AI Legal Assistant aims to facilitate easy access to complex legal documents related to AI regulations. By leveraging natural language processing and vector embeddings, users can query the system in plain language and retrieve the most relevant legal articles.
+AI Legal Assistant is a tool used for processing and analyzing legal texts related to AI with the help of a RAG application that we have developed. The project workflow consists of 4 main stages:
+- scraping data from 4 AI related European regulations (European Artifical Intelligence Act, Data Act, Data Governance act and the GDPR) and parsing it into overlapping passages,
+- embedding passages, storing the metadata in SQL databases and storing the embeddings separately in LanceDB files,
+- creating a script that retrieves top k most relevant articles above a certain threshold using a similarity search 
+- running the website on local host which constructs a prompt based on the user query and the retrieved articles which is then sent to GPT 3.5. 
 
 ## Project Workflow
 
-### 1. Data Collection
+### 1. Scraping and parsing data
 
-#### a. Web Scraping
-The initial step involves scraping official websites or repositories to collect the full text of each of the four regulations. Each regulation has its own subfolder within the `data` directory (e.g., `data/AI_Act`, `data/GDPR`). Within each subfolder:
+#### Web Scraping
+The initial step involves scraping official websites of the mentioned European regulations to collect their whole content. Each regulation has its own subfolder within the `data` directory. Within each subfolder there exists a scraping script (e.g. [`data/AI_Act/parsing_ai_act.py`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/parsing_ai_act.py)) that extracts the content from the regulation and stores the output in a JSON file within the same folder (e.g. [`data/AI_Act/ai_act.json`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/ai_act.json)). 
 
-- **Scraping Scripts**: Scripts like `scrape_ai_act.py` are used to download and extract the text of the regulations.
-- **Output Data**: The scraped data is saved as JSON files, maintaining the hierarchical structure of the regulations.
+#### Workflow
+1. **Requesting Pages**: Sends HTTP GET requests for each article.
+2. **Parsing HTML**: Uses BeautifulSoup to extract relevant data.
+3. **Extracting Data**: Extracting chapter name, article name and article content by manipulating tags within the HTML structure of websites and using regular expressions to filter out unwanted content. 
 
-#### b. Parsing and Structuring the Data
-After scraping, the legal texts are parsed into smaller, manageable passages:
+#### Parsing Passages
+After scraping the content, the legal texts are parsed into smaller, manageable passages:
 
-- **Passage Length and Overlap**: Passages are created with a defined length and overlap to ensure context is preserved across passages.
-- **Structured Data**: Each passage includes metadata such as regulation name, chapter, article, passage number, and content.
-- **Data Storage**: The structured passages are saved as JSON files for each regulation.
+- **Passage Structure**: Passages are created with a defined length and overlap to ensure context is preserved across passages belonging to the same article.
+- **Metadata**: Each passage includes metadata such as regulation name, chapter, article, passage number, and content.
+- **Saving passages**: All passages are stored along with their metadata in a JSON file. 
 
-### 2. Embedding Generation and Data Storage
+### 2. Embedding and database creation
+[`embed_store_data.py`](https://github.com/makov3c/legal-AI/blob/main/embed_store_data.py) is an interactive file that has 3 main fuctions: 
+- merging the 4 existing JSONs into one big one [`data/Merged/merged.json](https://github.com/makov3c/legal-AI/blob/main/data/Merged/merged.json),
+- embedding each passage,
+- storing metadata and embeddings. 
 
-#### a. Generating Embeddings
+#### Generating Embeddings
 Each passage is encoded into a high-dimensional vector (embedding) using a pre-trained language model:
 
-- **Model Used**: `BAAI/bge-small-en`, suitable for generating embeddings that capture semantic meaning.
-- **Process**:
-  - **Tokenization**: Passages are tokenized using the model's tokenizer.
-  - **Embedding**: Tokens are passed through the model to obtain embeddings.
-- **Normalization**: Embeddings are normalized to unit length to facilitate accurate similarity calculations.
+- **Model Used**: [`BAAI/bge-small-en`](https://huggingface.co/BAAI/bge-small-en), which is especially suitable for generating embeddings that capture a semantic meaning.
+- **Normalization**: Embeddings are normalized to unit length so we can later on compute the cosine similarity of each article. 
 
-#### b. Storing Embeddings and Metadata
+#### b. Storing Metadata and Embeddings 
 To optimize storage and retrieval efficiency, embeddings and metadata are stored separately:
 
-- **Embeddings in LanceDB**:
-  - Only the `id` (unique identifier) and the embedding vector are stored.
-  - LanceDB is a vector database optimized for efficient similarity searches.
 - **Metadata in SQLite Database**:
-  - Metadata such as regulation, chapter, article, passage, and content are stored.
+  - Metadata such as the id, regulation, chapter, article, passage number, and content are stored in their respective subfolders within the `data` directory (e.g. [`data/AI_act/ai_act.db`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/ai_act.db)).
   - This separation allows efficient vector searches while keeping detailed metadata accessible.
+- **Embeddings in LanceDB**:
+  - Corresponing ids and the embedding vectors are stored in LanceDB vector databases (e.g. [`lancedb_files/AI_Act/data`](https://github.com/makov3c/legal-AI/tree/main/lancedb_files/AI_Act/embeddings.lance/data)).
 
-**Process Flow**:
 
-1. **Insert Metadata**: Passages are inserted into the SQLite database, which assigns an `id` to each entry.
-2. **Store Embeddings**: Corresponding embeddings, along with their `id`s, are stored in LanceDB.
-
-### 3. Article Retrieval Process
+### 3. Article Retrieval
 
 When a user submits a query through the web interface, the system retrieves the most relevant articles through the following steps:
 
@@ -103,28 +93,6 @@ The Flask web application (`app.py`) provides the user interface and handles use
 2. **Process Query**: It calls the retrieval script to process the query and retrieve relevant articles.
 3. **Render Results**: The app renders results on the web page, including constructed prompts, relevant information, and relevant chunks.
 
-## Scripts and Utilities
-
-- **Data Scraping and Parsing Scripts**:
-  - Located in each regulation's subfolder within the `data` directory.
-  - Responsible for downloading and extracting legal texts.
-  - Used to parse scraped data into structured passages.
-
-- **Embedding and Storage Script**: `create_sql_and_store_embeddings.py` is an interactive file that:
-  - Merges JSON files.
-  - Generates embeddings for passages.
-  - Stores embeddings in LanceDB and metadata in SQLite databases.
-  - Deletes old LanceDB files before creating new ones to optimize storage.
-
-- **Article Retrieval Script**: `retrieving_articles.py`
-  - Processes user queries.
-  - Performs similarity searches in LanceDB.
-  - Retrieves and reconstructs relevant articles using the SQLite database.
-
-- **Web Application Script**: `app.py`
-  - Implements the Flask web application.
-  - Handles routes, user input, and rendering templates.
-
 ## Dependencies and Installation
 
 ### a. Python Version
@@ -150,7 +118,7 @@ git clone https://github.com/makov3c/legal-AI.git
 
 ## Usage Instructions
 
-1. **Start the Flask App**:
+1. **Run the Flask App locally**:
 
 ```bash
 python app.py
@@ -160,5 +128,7 @@ python app.py
    - Open your web browser and go to `http://127.0.0.1:5000/`.
    - Enter your query in the provided form.
 
-3. **View Results**:
-   - After submitting your query, view the constructed prompt, relevant information, and relevant chunks on the results page.
+3. **Output**:
+   - After submitting your query, view the constructed prompt and the response provided by GPT 3.5.
+
+   ![slika]()
