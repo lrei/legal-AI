@@ -29,7 +29,7 @@ After scraping the content, the legal texts are parsed into smaller, manageable 
 - **Metadata**: Each passage includes metadata such as regulation name, chapter, article, passage number, and content.
 - **Saving passages**: All passages are stored along with their metadata in a JSON file. 
 
-![slika]()
+![json](https://github.com/user-attachments/assets/ff5a7d79-cf7b-4861-86ee-62267168edc5)
 
 ### 2. Embedding and database creation
 #### Overview
@@ -113,8 +113,7 @@ git clone https://github.com/makov3c/legal-AI.git
   python app.py
   ```
 After running the file you should see this message
-
-![slika]()
+![message](https://github.com/user-attachments/assets/8fd1eb7b-e8a2-4979-b893-d15c8f06d9de)
 
 2. **Access the Interface**:
    - Open your web browser and go to `http://127.0.0.1:5000/`.
@@ -122,5 +121,5 @@ After running the file you should see this message
 
 3. **Output**:
    - After submitting your query, view the constructed prompt and the response provided by GPT 3.5.
+   ![query](https://github.com/user-attachments/assets/c6610178-3ba2-4056-863b-1c9e94f17802)
 
-   ![slika]()
