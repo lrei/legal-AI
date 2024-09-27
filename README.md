@@ -113,6 +113,7 @@ git clone https://github.com/makov3c/legal-AI.git
   python app.py
   ```
 After running the file you should see this message
+
 ![message](https://github.com/user-attachments/assets/8fd1eb7b-e8a2-4979-b893-d15c8f06d9de)
 
 2. **Access the Interface**:
@@ -121,5 +122,6 @@ After running the file you should see this message
 
 3. **Output**:
    - After submitting your query, view the constructed prompt and the response provided by GPT 3.5.
+   
    ![query](https://github.com/user-attachments/assets/c6610178-3ba2-4056-863b-1c9e94f17802)
 
