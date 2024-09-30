@@ -2,6 +2,7 @@ from flask import Flask, request, render_template
 import subprocess
 import os
 import openai
+import re
 
 app = Flask(__name__)
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -13,7 +14,7 @@ def get_chatgpt_response(prompt):
             messages=[
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=300
+            max_tokens=1000
         )
         return response.choices[0].message.content.strip()
     except openai.error.OpenAIError as e:
