@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
+# Easier to set the chapter titles manually
 chapter_mapping = {
     range(1, 3): "Chapter I: General provisions",
     range(3, 10): "Chapter II: Re-use of certain categories of protected data held by public sector bodies",
@@ -28,32 +29,7 @@ exclude_sections = [
     "The EU Cyber Diplomacy Toolbox"
 ]
 
-def int_to_roman(n):
-    roman_numerals = [
-        ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
-        ('C', 100), ('XC', 90), ('L', 50), ('XL', 40),
-        ('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)
-    ]
-    result = []
-    for numeral, value in roman_numerals:
-        while n >= value:
-            result.append(numeral)
-            n -= value
-    return ''.join(result)
-
-def get_chapter(art_number):
-    for article_range, chapter in chapter_mapping.items():
-        if art_number in article_range:
-            roman_chapter = chapter.split()[1] 
-            return f"{chapter.split(':')[0]}: {chapter.split(':')[1].strip()}"
-    return "Unknown Chapter"
-
-def get_chapter_number(art_number):
-    for article_range, chapter in chapter_mapping.items():
-        if art_number in article_range:
-            return chapter.split()[1] 
-    return "Unknown Chapter"
-
+# Splitting paragraphs into overlapping chunks
 def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
     chunks = []
     start = 0
@@ -71,17 +47,44 @@ def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
         start += 1
     return chunks
 
-# Removing unwanted space
+# Using roman numerals for chapter numbering
+def int_to_roman(n):
+    roman_numerals = [
+        ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
+        ('C', 100), ('XC', 90), ('L', 50), ('XL', 40),
+        ('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)
+    ]
+    result = []
+    for numeral, value in roman_numerals:
+        while n >= value:
+            result.append(numeral)
+            n -= value
+    return ''.join(result)
+
+# Filtering functions
 def clean_extra_spaces_in_text(text):
     return re.sub(r'(\d+)\.\s+', r'\1. ', text)
 
-# Replacing apostrophes
 def replace_apostrophes(text):
     text = text.replace("‘", "'").replace("’", "' ")
     return text
 
 def normalize_text(text):
     return re.sub(r'[:,]', ' ', text).lower().strip()
+
+# Scraping relevant data 
+def get_chapter(art_number):
+    for article_range, chapter in chapter_mapping.items():
+        if art_number in article_range:
+            roman_chapter = chapter.split()[1] 
+            return f"{chapter.split(':')[0]}: {chapter.split(':')[1].strip()}"
+    return "Unknown Chapter"
+
+def get_chapter_number(art_number):
+    for article_range, chapter in chapter_mapping.items():
+        if art_number in article_range:
+            return chapter.split()[1] 
+    return "Unknown Chapter"
 
 def scrape_article(art_number):
     url = f"https://www.european-data-governance-act.com/Data_Governance_Act_Article_{art_number}.html"
@@ -156,7 +159,8 @@ def scrape_article(art_number):
 
     return json_objects
 
-def scrape_dga(output_file='DGA/dga.json'):
+# Scrape all articles and save everything to governance_act.json in the same directory
+def scrape_dga(output_file='data/Data_Governance_Act/governance_act.json'):
     all_json_objects = []
 
     for art_number in range(1, 39): 

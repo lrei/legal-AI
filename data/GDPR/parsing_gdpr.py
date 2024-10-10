@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-# Manually setting chapter and article titles
+# Easier to set the chapter and article titles manually
 chapter_mapping_manual = {
     range(1, 5): "Chapter I: General provisions",
     range(5, 12): "Chapter II: Principles",
@@ -120,28 +120,7 @@ article_titles_manual = {
     99: "Entry into force and application"
 }
 
-def int_to_roman(n):
-    roman_numerals = [
-        ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
-        ('C', 100), ('XC', 90), ('L', 50), ('XL', 40),
-        ('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)
-    ]
-    result = []
-    for numeral, value in roman_numerals:
-        while n >= value:
-            result.append(numeral)
-            n -= value
-    return ''.join(result)
-
-def get_chapter(art_number):
-    for article_range, chapter in chapter_mapping_manual.items():
-        if art_number in article_range:
-            return chapter
-    return "Unknown Chapter"
-
-def get_article_title(art_number):
-    return article_titles_manual.get(art_number, "Unknown Title")
-
+# Splitting paragraphs into overlapping chunks
 def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
     chunks = []
     start = 0
@@ -159,6 +138,20 @@ def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
         start += 1
     return chunks
 
+# Using roman numerals for chapter numbering
+def int_to_roman(n):
+    roman_numerals = [
+        ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
+        ('C', 100), ('XC', 90), ('L', 50), ('XL', 40),
+        ('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)
+    ]
+    result = []
+    for numeral, value in roman_numerals:
+        while n >= value:
+            result.append(numeral)
+            n -= value
+    return ''.join(result)
+
 # Handling special cases where a space is missing between two words due to a hyperlink
 def fix_missing_spaces(text):
     text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
@@ -167,6 +160,7 @@ def fix_missing_spaces(text):
     text = re.sub(r'(\d)\s*(to|and|or)\s*(\d)', r'\1 \2 \3', text)
     return text
 
+# Filtering functions
 def format_article_mentions(text):
     text = fix_missing_spaces(text)
     text = re.sub(r'\b(Articles?)\s*(\d+)\b', r'\1 \2', text)
@@ -184,6 +178,16 @@ def process_br_tags(paragraph):
     combined_text = ''.join(text_parts)
     formatted_text = format_article_mentions(combined_text)
     return [part.strip() for part in formatted_text.split('\n') if part.strip()]
+
+# Scraping relevant data 
+def get_chapter(art_number):
+    for article_range, chapter in chapter_mapping_manual.items():
+        if art_number in article_range:
+            return chapter
+    return "Unknown Chapter"
+
+def get_article_title(art_number):
+    return article_titles_manual.get(art_number, "Unknown Title")
 
 def scrape_article(art_number):
     if art_number == 41:
@@ -216,6 +220,7 @@ def scrape_article(art_number):
         if not paragraph.text.strip():
             continue
 
+        # Handling some exceptions
         if 'Recital relating to this Article' in paragraph.text:
             continue
         
@@ -249,7 +254,8 @@ def scrape_article(art_number):
 
     return json_objects
 
-def scrape_gdpr(output_file='GDPR/gdpr.json'):
+# Scrape all articles and save everything to gdpr.json in the same directory
+def scrape_gdpr(output_file='data/GDPR/gdpr.json'):
     all_json_objects = []
     for art_number in range(1, 100): 
         article_data = scrape_article(art_number)

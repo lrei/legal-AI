@@ -354,7 +354,14 @@
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.2.1",
-        "Content": "(1) 'data' means any digital representation of acts, facts or information and any compilation of such acts, facts or information, including in the form of sound, visual or audio-visual recording;"
+        "Content": "(1) 'data' means any digital representation of acts, facts or information and any compilation of such acts, facts or information, including in the form of sound, visual or audio-visual"
+    },
+    {
+        "Regulation": "The European Data Act",
+        "Chapter": "Chapter I: General provisions",
+        "Article": "Article 2: Definitions",
+        "Passage": "I.2.2.2",
+        "Content": "sound, visual or audio-visual recording;"
     },
     {
         "Regulation": "The European Data Act",
@@ -424,28 +431,28 @@
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.8.1",
-        "Content": "(7) 'processing' means any operation or set of operations which is performed on data or on sets of data, whether or not by automated means, such as collection, recording, organisation, structuring,"
+        "Content": "(7) 'processing' means any operation or set of operations which is performed on data or on sets of data, whether or not by automated means, such as collection, recording, organisation,"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.8.2",
-        "Content": "organisation, structuring, storage, adaptation or alteration, retrieval, consultation, use, disclosure by transmission, dissemination, or other means of making them available, alignment"
+        "Content": "recording, organisation, structuring, storage, adaptation or alteration, retrieval, consultation, use, disclosure by transmission, dissemination, or other means of making them available,"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.8.3",
-        "Content": "them available, alignment or combination, restriction, erasure or destruction;"
+        "Content": "of making them available, alignment or combination, restriction, erasure or destruction;"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.9.1",
-        "Content": "(8) 'data processing service' means a digital service that is provided to a customer and that enables ubiquitous and on-demand network access to a shared pool of configurable, scalable and"
+        "Content": "(8) 'data processing service' means a digital service that is provided to a customer and that enables ubiquitous and on-demand network access to a shared pool of configurable, scalable"
     },
     {
         "Regulation": "The European Data Act",
@@ -557,14 +564,14 @@
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.17.1",
-        "Content": "(16) 'related service data' means data representing the digitisation of user actions or of events related to the connected product, recorded intentionally by the user or generated as a by-product"
+        "Content": "(16) 'related service data' means data representing the digitisation of user actions or of events related to the connected product, recorded intentionally by the user or generated as a"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.17.2",
-        "Content": "or generated as a by-product of the user' s action during the provision of a related service by the provider;"
+        "Content": "by the user or generated as a by-product of the user' s action during the provision of a related service by the provider;"
     },
     {
         "Regulation": "The European Data Act",
@@ -662,14 +669,14 @@
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.28.1",
-        "Content": "(27) 'Union bodies' means the Union bodies, offices and agencies set up by or pursuant to acts adopted on the basis of the Treaty on European Union, the TFEU or the Treaty establishing the"
+        "Content": "(27) 'Union bodies' means the Union bodies, offices and agencies set up by or pursuant to acts adopted on the basis of the Treaty on European Union, the TFEU or the Treaty establishing"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.28.2",
-        "Content": "the Treaty establishing the European Atomic Energy Community;"
+        "Content": "or the Treaty establishing the European Atomic Energy Community;"
     },
     {
         "Regulation": "The European Data Act",
@@ -746,14 +753,14 @@
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.33.1",
-        "Content": "(32) 'digital assets' means elements in digital form, including applications, for which the customer has the right of use, independently from the contractual relationship with the data processing"
+        "Content": "(32) 'digital assets' means elements in digital form, including applications, for which the customer has the right of use, independently from the contractual relationship with the data"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.33.2",
-        "Content": "with the data processing service it intends to switch from;"
+        "Content": "relationship with the data processing service it intends to switch from;"
     },
     {
         "Regulation": "The European Data Act",
@@ -816,14 +823,14 @@
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.37.1",
-        "Content": "(36) 'switching charges' means charges, other than standard service fees or early termination penalties, imposed by a provider of data processing services on a customer for the actions mandated"
+        "Content": "(36) 'switching charges' means charges, other than standard service fees or early termination penalties, imposed by a provider of data processing services on a customer for the actions"
     },
     {
         "Regulation": "The European Data Act",
         "Chapter": "Chapter I: General provisions",
         "Article": "Article 2: Definitions",
         "Passage": "I.2.37.2",
-        "Content": "for the actions mandated by this Regulation for switching to the system of a different provider or to on-premises ICT infrastructure, including data egress charges;"
+        "Content": "on a customer for the actions mandated by this Regulation for switching to the system of a different provider or to on-premises ICT infrastructure, including data egress charges;"
     },
     {
         "Regulation": "The European Data Act",

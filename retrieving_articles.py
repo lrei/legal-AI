@@ -4,8 +4,9 @@ from transformers import AutoModel, AutoTokenizer
 import torch
 import lancedb
 import os
-import sys
 from sentence_transformers import CrossEncoder
+from numpy import dot
+from numpy.linalg import norm
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -19,12 +20,13 @@ def generate_bge_embedding(text, tokenizer, model):
         embedding = outputs.last_hidden_state.mean(dim=1).numpy().flatten()
     return normalize_embedding(embedding)
 
-# Function to retrieve metadata from the SQLite database
+def cosine_similarity(a, b):
+    return dot(a, b)/(norm(a)*norm(b))
+
 def get_metadata_from_db(cursor, id_value):
     cursor.execute("SELECT regulation, chapter, article, passage, content FROM embeddings WHERE id = ?", (id_value,))
     return cursor.fetchone()
 
-# Function to retrieve the full article, assembling all its passages
 def get_full_article(cursor, regulation, article):
     cursor.execute("""
         SELECT passage, content 
@@ -37,12 +39,6 @@ def get_full_article(cursor, regulation, article):
     rows = cursor.fetchall()
     return rows  
 
-from numpy import dot
-from numpy.linalg import norm
-
-def cosine_similarity(a, b):
-    return dot(a, b)/(norm(a)*norm(b))
-
 def search_legislation_lance(query_text, query_embedding, table, cursor, reranker, k=10, initial_limit=30, cosine_similarity_threshold=0.3):
     query_embedding = normalize_embedding(query_embedding.tolist())
     candidate_passages = []
@@ -52,9 +48,7 @@ def search_legislation_lance(query_text, query_embedding, table, cursor, reranke
     # Retrieve search results from LanceDB and ensure embeddings are included
     results = table.search(query_embedding).limit(limit).to_pandas()
     
-    # Ensure that the 'vector' column is present
     if 'vector' not in results.columns:
-        # Fetch the embeddings separately if not included
         ids = results['id'].tolist()
         vectors = table.filter(table['id'].isin(ids)).to_pandas()
         results = results.merge(vectors[['id', 'vector']], on='id')
@@ -75,7 +69,7 @@ def search_legislation_lance(query_text, query_embedding, table, cursor, reranke
         if metadata:
             regulation, chapter, article, passage, content = metadata
             
-            # Omit articles titled "Definitions"
+            # Omit articles titled "Definitions" because they do not provide any insight
             if "definitions" in article.lower():
                 continue
             
@@ -97,11 +91,7 @@ def search_legislation_lance(query_text, query_embedding, table, cursor, reranke
 
     # Compute relevance scores using the CrossEncoder re-ranker
     relevance_scores = reranker.predict(reranker_inputs)
-
-    # Pair passages with their scores and metadata
     scored_passages = list(zip(candidate_passages, relevance_scores, passage_metadata))
-
-    # Sort passages based on relevance scores in descending order
     scored_passages.sort(key=lambda x: x[1], reverse=True)
 
     # Select the top K passages
@@ -124,7 +114,6 @@ def search_legislation_lance(query_text, query_embedding, table, cursor, reranke
                 'cosine_similarity': cosine_sim
             }
         else:
-            # Update the cosine similarity if this passage has a higher value
             if cosine_sim > article_results[article_key]['cosine_similarity']:
                 article_results[article_key]['cosine_similarity'] = cosine_sim
 
@@ -143,6 +132,7 @@ def combine_passages_with_overlap_removal(full_article_content, overlap_length=3
             combined_article += "\n"
 
         if previous_chunk:
+            # Remove overlap between passages
             overlap_start = min(overlap_length, len(previous_chunk))
             while overlap_start > 0 and previous_chunk[-overlap_start:] != content[:overlap_start]:
                 overlap_start -= 1
@@ -155,22 +145,7 @@ def combine_passages_with_overlap_removal(full_article_content, overlap_length=3
 
     return combined_article.strip()
 
-def main():
-    if len(sys.argv) < 2:
-        print("No query text provided.")
-        sys.exit(1)
-    else:
-        query_text = sys.argv[1]
-        try:
-            k = int(sys.argv[2]) if len(sys.argv) > 2 else 10  # Default number of articles
-        except ValueError:
-            k = 10
-
-        try:
-            cosine_similarity_threshold = float(sys.argv[3]) if len(sys.argv) > 3 else 0.6  # Threshold
-        except ValueError:
-            cosine_similarity_threshold = 0.6
-
+def retrieve_articles(query_text, k=10, threshold=0.6, sentence_transformer_model="BAAI/bge-small-en", reranker_model='cross-encoder/ms-marco-MiniLM-L-6-v2'):
     # Connect to LanceDB and open the embeddings table
     ldb = lancedb.connect('lancedb_files/Merged')
     table = ldb.open_table('embeddings')
@@ -180,40 +155,37 @@ def main():
     cursor = conn.cursor()
 
     # Load the BGE embedding model
-    model_name = "BAAI/bge-small-en"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModel.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(sentence_transformer_model, trust_remote_code=True)
+    model = AutoModel.from_pretrained(sentence_transformer_model, trust_remote_code=True)
 
     # Load the Cross-Encoder re-ranking model
-    reranker_model_name = 'cross-encoder/ms-marco-MiniLM-L-6-v2'
-    reranker = CrossEncoder(reranker_model_name)
+    reranker = CrossEncoder(reranker_model)
 
     # Generate the query embedding
     query_embedding = generate_bge_embedding(query_text, tokenizer, model)
 
     # Search for relevant articles with re-ranking and cosine similarity threshold
     results = search_legislation_lance(
-        query_text, query_embedding, table, cursor, reranker, k=k, cosine_similarity_threshold=cosine_similarity_threshold
+        query_text, query_embedding, table, cursor, reranker, k=k, cosine_similarity_threshold=threshold
     )
+
+    conn.close()
+
+    articles = []
 
     if results:
         for (regulation, article), article_info in results.items():
             chapter = article_info['chapter']
             full_article_content = article_info['full_article']
-            cosine_similarity = article_info['cosine_similarity']
             combined_content = combine_passages_with_overlap_removal(full_article_content)
             output = (
                 f"Regulation: {regulation}\n"
                 f"{chapter}\n"
                 f"{article}\n"
-                #f"Cosine Similarity: {cosine_similarity:.4f}\n"
                 f"{combined_content}\n"
             )
-            print(output)
+            articles.append(output)
     else:
-        print("No relevant articles found.")
+        articles.append("No relevant articles found.")
 
-    conn.close()
-
-if __name__ == "__main__":
-    main()
+    return articles

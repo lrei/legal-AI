@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-# Manually setting the chapter titles because it is easier
+# Easier to set the chapter titles manually
 chapter_mapping = {
     range(1, 3): "Chapter 1: General provisions",
     range(3, 8): "Chapter 2: Business to consumer and business to business data sharing",
@@ -18,33 +18,7 @@ chapter_mapping = {
     range(44, 51): "Chapter 11: Final provisions"
 }
 
-def int_to_roman(n):
-    roman_numerals = [
-        ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
-        ('C', 100), ('XC', 90), ('L', 50), ('XL', 40),
-        ('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)
-    ]
-    result = []
-    for numeral, value in roman_numerals:
-        while n >= value:
-            result.append(numeral)
-            n -= value
-    return ''.join(result)
-
-def get_chapter(art_number):
-    for article_range, chapter in chapter_mapping.items():
-        if art_number in article_range:
-            chapter_number = int(chapter.split()[1].replace(":", ""))
-            roman_chapter = int_to_roman(chapter_number)
-            return f"Chapter {roman_chapter}: {chapter.split(':')[1].strip()}"
-    return "Unknown Chapter"
-
-def get_chapter_number(art_number):
-    for article_range, chapter in chapter_mapping.items():
-        if art_number in article_range:
-            chapter_number = int(chapter.split()[1].replace(":", ""))
-            return int_to_roman(chapter_number)
-
+# Splitting paragraphs into overlapping chunks
 def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
     chunks = []
     start = 0
@@ -62,15 +36,52 @@ def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
         start += 1
     return chunks
 
+# Using roman numerals for chapter numbering
+def int_to_roman(n):
+    roman_numerals = [
+        ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
+        ('C', 100), ('XC', 90), ('L', 50), ('XL', 40),
+        ('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)
+    ]
+    result = []
+    for numeral, value in roman_numerals:
+        while n >= value:
+            result.append(numeral)
+            n -= value
+    return ''.join(result)
+
+# Filtering functions 
 def clean_extra_spaces_in_text(text):
     return re.sub(r'(\d+)\.\s+', r'\1. ', text)
 
 def replace_apostrophes(text):
     text = text.replace("‘", "'").replace("’", "' ")
+    text = re.sub(r"\)\s*'", ") '", text)
     return text
 
 def normalize_text(text):
     return re.sub(r'[:,]', ' ', text).lower().strip()
+
+# Function to split at numbered parentheses followed by space and apostrophe (used only for Article 2)
+def split_at_numbered_parentheses(text):
+    pattern = r'(?=\(\d+\)\s\')'
+    split_text = re.split(pattern, text)
+    return [piece.strip() for piece in split_text if piece.strip()]
+
+# Scraping relevant data
+def get_chapter(art_number):
+    for article_range, chapter in chapter_mapping.items():
+        if art_number in article_range:
+            chapter_number = int(chapter.split()[1].replace(":", ""))
+            roman_chapter = int_to_roman(chapter_number)
+            return f"Chapter {roman_chapter}: {chapter.split(':', 1)[1].strip()}"
+    return "Unknown Chapter"
+
+def get_chapter_number(art_number):
+    for article_range, chapter in chapter_mapping.items():
+        if art_number in article_range:
+            chapter_number = int(chapter.split()[1].replace(":", ""))
+            return int_to_roman(chapter_number)
 
 def scrape_article(art_number):
     url = f"https://www.eu-data-act.com/Data_Act_Article_{art_number}.html"
@@ -116,28 +127,41 @@ def scrape_article(art_number):
         if not paragraph_text:
             continue
 
-        if len(paragraph_text) > 184:
-            paragraph_chunks = split_paragraph_with_overlap_characters(paragraph_text, chunk_size=184, overlap=30)
+        # Handling Article 2 seperately
+        if art_number == 2:
+            sub_paragraphs = split_at_numbered_parentheses(paragraph_text)
+            if not sub_paragraphs:
+                sub_paragraphs = [paragraph_text]
         else:
-            paragraph_chunks = [paragraph_text]
+            sub_paragraphs = [paragraph_text]
 
-        for chunk_counter, chunk in enumerate(paragraph_chunks, start=1):
-            passage_number = f"{chapter_number}.{art_number}.{paragraph_counter}.{chunk_counter}"
+        for sub_paragraph in sub_paragraphs:
+            if not sub_paragraph:
+                continue
 
-            data = {
-                'Regulation': "The European Data Act",
-                'Chapter': chapter_title,
-                'Article': full_article_title,
-                'Passage': passage_number,
-                'Content': chunk
-            }
-            json_objects.append(data)
+            if len(sub_paragraph) > 184:
+                paragraph_chunks = split_paragraph_with_overlap_characters(sub_paragraph, chunk_size=184, overlap=30)
+            else:
+                paragraph_chunks = [sub_paragraph]
 
-        paragraph_counter += 1
+            for chunk_counter, chunk in enumerate(paragraph_chunks, start=1):
+                passage_number = f"{chapter_number}.{art_number}.{paragraph_counter}.{chunk_counter}"
+
+                data = {
+                    'Regulation': "The European Data Act",
+                    'Chapter': chapter_title,
+                    'Article': full_article_title,
+                    'Passage': passage_number,
+                    'Content': chunk
+                }
+                json_objects.append(data)
+
+            paragraph_counter += 1
 
     return json_objects
 
-def scrape_data_act(output_file='DA/da.json'):
+# Scrape all articles and save everything to data_act.json in the same directory
+def scrape_data_act(output_file='data/Data_Act/data_act.json'):
     all_json_objects = []
 
     for art_number in range(1, 51): 

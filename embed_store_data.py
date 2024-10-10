@@ -15,6 +15,7 @@ def embed_paragraph(paragraph, tokenizer, model):
     embeddings = outputs.last_hidden_state[:, 0, :].squeeze()
     return embeddings.numpy()
 
+# Relative paths
 def get_file_paths(choice):
     if choice == 'dga':
         json_file = 'data/Data_Governance_Act/governance_act.json'
@@ -80,7 +81,7 @@ def process_regulation(choice, tokenizer, model):
         paragraphs_data = json.load(f)
 
 
-# Creating thr SQL database
+# Creating the SQL database
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 

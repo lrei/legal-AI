@@ -3,7 +3,7 @@ import json
 from bs4 import BeautifulSoup
 import requests
 
-# Function to split paragraphs into overlapping chunks
+# Splitting paragraphs into overlapping chunks
 def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
     chunks = []
     start = 0
@@ -21,12 +21,15 @@ def split_paragraph_with_overlap_characters(text, chunk_size=184, overlap=30):
         start += 1
     return chunks
 
+# Filtering unwanted characters
 def clean_paragraph_text(paragraph):
     for span in paragraph.find_all('span', class_='aia-recital-ref'):
         span.decompose() 
-    return paragraph.get_text().strip()
+    text = paragraph.get_text().strip()
+    text = text.replace('\n', ' ')
+    return text
 
-# Using roman numerals for chapter numbers
+# Using roman numerals for numbering chapters
 def int_to_roman(n):
     roman_numerals = [
         ('M', 1000), ('CM', 900), ('D', 500), ('CD', 400),
@@ -40,6 +43,8 @@ def int_to_roman(n):
             n -= value
     return ''.join(result)
 
+
+# Scraping relevant data
 def get_chapter_number(chapter):
     match = re.search(r'Chapter (\w+)', chapter)
     chapter_number = match.group(1) if match else '1'
@@ -102,15 +107,15 @@ def scrape_article(art_number):
                         'Regulation': "European Artificial Intelligence Act",
                         'Chapter': chapter,
                         'Article': article,
-                        'Passage': f'{chapter_number}.{article_number}.{passage_counter}.{j + 1}',  # Correct passage and chunk numbering
+                        'Passage': f'{chapter_number}.{article_number}.{passage_counter}.{j + 1}',
                         'Content': chunk
                     }
                     json_objects.append(data)
 
     return json_objects
 
-# Scrape all articles and save to JSON
-def scrape_all_articles(start=1, end=114, output_file='EAA/eaa.json'):
+# Scrape all articles and save everything to ai_act.json in the same directory
+def scrape_all_articles(start=1, end=113, output_file='data/AI_Act/ai_act.json'):
     all_json_objects = []
 
     for art in range(start, end + 1):

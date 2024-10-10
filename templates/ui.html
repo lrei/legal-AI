@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Legal Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            margin: 10px;
+        }
+        pre {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        .response {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .error {
+            color: red;
+        }
+        .advanced-params {
+            display: none;
+            margin-left: 20px;
+        }
+        .form-container {
+            display: flex;
+            align-items: flex-start;
+        }
+        .form-item {
+            margin-bottom: 10px;
+        }
+        .form-columns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .form-column {
+            display: flex;
+            flex-direction: column;
+        }
+        #promptTemplate {
+            display: none;
+            margin-top: 20px;
+        }
+        .top-right-image {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            width: 100px;
+        }
+        @media (max-width: 1200px) {
+            .form-container {
+                flex-direction: column;
+            }
+            .advanced-params {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip-right .tooltiptext {
+            left: 0; 
+            right: auto;
+            top: -180px; 
+            margin-left: 0; 
+            transform: none; 
+        }
+
+        .tooltip-right .tooltiptext::after {
+            top: 100%;
+            left: 10px;
+            margin-left: 0;
+        }
+
+                /* New CSS for the smaller, black question mark image */
+        .question-mark-icon {
+            width: 8px;  /* Adjust size as needed */
+            height: auto; /* Maintain aspect ratio */
+            margin-left: 3px;
+            margin-top: -12px;
+            vertical-align: middle;  /* Align with the label text */
+        }
+
+        /* General styling for the link */
+        .question-mark-link {
+            text-decoration: none;
+            color: black; /* Optional, since the image is black */
+        }
+
+
+    </style>
+    <script>
+        function toggleParams(option) {
+            const advancedParams = document.getElementById('advancedParams');
+            const promptTemplate = document.getElementById('promptTemplate');
+            if (option === 'advanced') {
+                advancedParams.style.display = 'flex';
+                promptTemplate.style.display = 'block';
+            } else {
+                advancedParams.style.display = 'none';
+                promptTemplate.style.display = 'none';
+            }
+        }
+
+        window.onload = function() {
+            toggleParams('advanced');
+        }
+    </script>
+</head>
+<body>
+
+    <img src="https://www.eitmanufacturing.eu/wp-content/uploads/2021/10/JSI-Logo-002.jpg" alt="JSI Logo" class="top-right-image" style="width: 380px;">
+
+    <h1>AI Legal Assistant</h1>
+
+    <!-- Toggle between Default and Advanced parameters -->
+    <label for="param-choice-default">
+        <input type="radio" id="param-choice-default" name="param-choice" value="default" onclick="toggleParams('default')">
+        Default Parameters
+    </label>
+    <label for="param-choice-advanced">
+        <input type="radio" id="param-choice-advanced" name="param-choice" value="advanced" checked onclick="toggleParams('advanced')">
+        Custom Parameters
+    </label>
+    <br><br>
+
+    <!-- Form submission -->
+    <form action="/query" method="post">
+        <div class="form-container">
+            <!-- User query textarea -->
+            <div>
+                <label for="query">Provide details about your legal matter involving artificial intelligence:</label><br>
+                <textarea id="query" name="query" rows="10" cols="90" required></textarea><br><br>
+            </div>
+
+            <!-- Advanced parameters section -->
+            <div id="advancedParams" class="advanced-params">
+                <div class="form-columns">
+                    <!-- First column: Maximum Articles, Threshold, Number of Responses -->
+                    <div class="form-column">
+                        <div class="form-item tooltip">
+                            <label for="max_articles">Maximum Articles:</label><br>
+                            <input type="number" id="max_articles" name="max_articles" value="{{ config.get('max_articles', 2) }}"><br>
+                            <span class="tooltiptext">Maximum number of legal articles you would like to retrieve from European regulations.</span>
+                        </div>  
+                        <div class="form-item tooltip">
+                            <label for="threshold">Passage Threshold:</label><br>
+                            <input type="number" id="threshold" name="threshold" step="0.01" value="{{ config.get('threshold', 0.6) }}"><br>
+                            <span class="tooltiptext">Input a number between 0 and 1 to set the minimum threshold for a legal article to be retrieved. Higher number means stricter article search which is based on cosine similarity.</span>
+                        </div>
+                        <div class="form-item tooltip">
+                            <label for="num_responses">Number of Responses:</label><br>
+                            <input type="number" id="num_responses" name="num_responses" value="{{ config.get('num_responses', 2) }}"><br>
+                            <span class="tooltiptext">The number of response variations the LLM model should generate for your input query.</span>
+                        </div>
+                    </div>
+
+                    <!-- Second column: Embedding Model and Reranking Model -->
+                    <div class="form-column">
+                        <div class="form-item tooltip">
+                            <label for="sentence_transformer_model">
+                                Embedding Model:
+                                <a href="https://huggingface.co/models?other=embeddings" target="_blank" class="question-mark-link">
+                                    <img src="https://static-00.iconduck.com/assets.00/black-question-mark-ornament-emoji-341x512-nbgnefde.png" alt="Question Mark" class="question-mark-icon">
+                                </a>                                
+                            </label><br>
+                            <input type="text" id="sentence_transformer_model" name="sentence_transformer_model" size="40" value="{{ config.get('sentence_transformer_model', 'BAAI/bge-small-en') }}"><br>
+                            <span class="tooltiptext">The embedding model used to convert text into numerical vectors for semantic similarity calculations.</span>
+                        </div>
+                        <div class="form-item tooltip">
+                            <label for="reranker_model">
+                                Reranking Model:
+                                <a href="https://huggingface.co/models?other=reranker" target="_blank" class="question-mark-link">
+                                    <img src="https://static-00.iconduck.com/assets.00/black-question-mark-ornament-emoji-341x512-nbgnefde.png" alt="Question Mark" class="question-mark-icon">
+                                </a>
+                            </label><br>
+                            <input type="text" id="reranker_model" name="reranker_model" size="40" value="{{ config.get('reranker_model', 'cross-encoder/ms-marco-MiniLM-L-6-v2') }}"><br>
+                            <span class="tooltiptext">The reranking model that re-evaluates and ranks the retrieved legal articles based on their relevance to your query.</span>
+                        </div>
+                    </div>
+
+                    <!-- Third column: LLM Model, Maximum Tokens, and Temperature -->
+                    <div class="form-column">
+                        <div class="form-item tooltip">
+                            <label for="openai_model">
+                                LLM Model:
+                                <a href="https://llm.datasette.io/en/stable/openai-models.html" target="_blank" class="question-mark-link">
+                                    <img src="https://static-00.iconduck.com/assets.00/black-question-mark-ornament-emoji-341x512-nbgnefde.png" alt="Question Mark" class="question-mark-icon">
+                                </a>
+                            </label><br>
+                            <input type="text" id="openai_model" name="openai_model" value="{{ config.get('openai_model', 'gpt-3.5-turbo') }}"><br>
+                            <span class="tooltiptext" style="font-size: 16px;">The Large Language Model which receives the retrieved articles and generates the prompt, e.g.: "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"...</span>
+                        </div>
+                        
+                        <div class="form-item tooltip">
+                            <label for="max_tokens">Maximum Tokens:</label><br>
+                            <input type="number" id="max_tokens" name="max_tokens" step="100" value="{{ config.get('max_tokens', 500) }}"><br>
+                            <span class="tooltiptext">Sets the upper limit on the length of the generated response, measured in tokens.</span>
+                        </div>
+                        <div class="form-item tooltip">
+                            <label for="temperature">Model Temperature:</label><br>
+                            <input type="number" id="temperature" name="temperature" step="0.01" value="{{ config.get('temperature', 0.2) }}"><br>
+                            <span class="tooltiptext">Number between 0 and 1 that controls the randomness of the model's responses. Lower values produce more focused and deterministic answers, while higher values result in more creative and varied outputs.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Template - Positioned below the query and columns -->
+        <div id="promptTemplate">
+            <div class="form-item">
+                <label for="prompt_template" class="tooltip tooltip-right">Prompt Template:
+                    <span class="tooltiptext">A custom prompt template that structures the input for the language model to generate responses. In the prompt you can position the retrieved articles with {context} and your query with {user_query} if needed. </span>
+                </label><br>
+                <textarea id="prompt_template" name="prompt_template" rows="15" cols="90">{{ config.get('prompt_template', '') }}</textarea><br><br>
+            </div>
+        </div>
+
+        <button type="submit" style="padding: 5px 5px; font-size: 15px;">Submit</button>
+
+    </form>
+
+    {% if error_message %}
+        <div class="error">
+            <p>{{ error_message }}</p>
+        </div>
+    {% endif %}
+
+    {% if user_query %}
+        <h2>Submitted Query:</h2>
+        <p>{{ user_query }}</p>
+
+        <h2>Constructed Prompt:</h2>
+        <pre>{{ prompt }}</pre>
+
+        <h2>Responses from the Assistant:</h2>
+        {% for response in responses %}
+            <div class="response">
+                <pre>{{ response }}</pre>
+            </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>

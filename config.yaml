@@ -1,0 +1,17 @@
+max_tokens: 3000
+openai_model: "gpt-3.5-turbo"
+max_articles: 8
+threshold: 0.5
+sentence_transformer_model: "BAAI/bge-small-en-v1.5"
+reranker_model: "sentence-transformers/all-MiniLM-L6-v2"
+num_responses: 1
+temperature: 0.5
+prompt_template: |
+  Consider the following articles of legislation, provided between triple backticks, and nothing else:
+  ```{context}```
+
+  Under these articles and only these articles, and ignoring those that are not applicable, as a legal compliance expert, answer: what are the implications of the provided articles to the following legal matter, in triple backticks:
+  ```{user_query}```
+
+  Answer article by article and don't provide any additional introduction or conclusions.
+  Let's think step by step.
