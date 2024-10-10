@@ -49,7 +49,7 @@
         .top-right-image {
             position: absolute;
             top: 30px;
-            right: 50px;
+            right: 200px;
             width: 100px;
         }
         @media (max-width: 1200px) {
@@ -109,7 +109,7 @@
             margin-left: 0;
         }
 
-                /* New CSS for the smaller, black question mark image */
+        /* New CSS for the smaller, black question mark image */
         .question-mark-icon {
             width: 8px;  /* Adjust size as needed */
             height: auto; /* Maintain aspect ratio */
@@ -123,7 +123,6 @@
             text-decoration: none;
             color: black; /* Optional, since the image is black */
         }
-
 
     </style>
     <script>
@@ -167,7 +166,7 @@
             <!-- User query textarea -->
             <div>
                 <label for="query">Provide details about your legal matter involving artificial intelligence:</label><br>
-                <textarea id="query" name="query" rows="10" cols="90" required></textarea><br><br>
+                <textarea id="query" name="query" rows="10" cols="90" required style="margin-top: 3px;"></textarea><br><br>
             </div>
 
             <!-- Advanced parameters section -->
@@ -252,6 +251,20 @@
                 </label><br>
                 <textarea id="prompt_template" name="prompt_template" rows="15" cols="90">{{ config.get('prompt_template', '') }}</textarea><br><br>
             </div>
+        </div>
+
+        <!-- API Key input field -->
+        <div class="form-item">
+            <label for="api_key">API Key:</label><br>
+            <input type="password" id="api_key" name="api_key" size="97" value="{{ session.get('api_key', '') }}"><br><br>
+        </div>
+
+        <!-- Store API Key checkbox -->
+        <div class="form-item">
+            <label>
+                <input type="checkbox" id="store_api_key" name="store_api_key" {% if session.get('api_key') %}checked{% endif %}>
+                Store API key for this session
+            </label>
         </div>
 
         <button type="submit" style="padding: 5px 5px; font-size: 15px;">Submit</button>

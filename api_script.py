@@ -7,7 +7,7 @@ data = {
 
     # Set parameters
     'max_articles': 10,  # Maximum number of legal articles you would like to retrieve from European regulations.
-    'threshold': 0.4,    # Input a number between 0 and 1 to set the minimum threshold for a legal article to be retrieved. Higher number means stricter article search which is based on cosine similarity.
+    'threshold': 0.5,    # Input a number between 0 and 1 to set the minimum threshold for a legal article to be retrieved. Higher number means stricter article search which is based on cosine similarity.
     'num_responses': 1,  # The number of response variations the LLM model should generate for your input query.
     'sentence_transformer_model': 'BAAI/bge-small-en-v1.5',  # The embedding model used to convert text into numerical vectors for semantic similarity calculations.
     'reranker_model': 'sentence-transformers/all-MiniLM-L6-v2',  # The reranking model that re-evaluates and ranks the retrieved legal articles based on their relevance to your query.
