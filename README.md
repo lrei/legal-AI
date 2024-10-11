@@ -115,7 +115,7 @@ git clone https://github.com/makov3c/legal-AI.git
   ```
 After running the file you should see this message
 
-![uvicorn](https://github.com/user-attachments/assets/8fd1eb7b-e8a2-4979-b893-d15c8f06d9de)
+![uvicorn](https://github.com/user-attachments/assets/4253e095-9779-42be-9101-f6aad1c3673b)
 
 2. **Access the Interface**:
    - Open your web browser and go to `http://127.0.0.1:8001/`.
