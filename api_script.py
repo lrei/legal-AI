@@ -1,18 +1,19 @@
 import requests
 
+# Make sure the app is running locally 
 api_url = 'http://127.0.0.1:8001/query'
 
 data = {
-    'query': '',  # Provide details about your legal matter involving artificial intelligence
+    'query': '',  # Provide details about your legal matter involving artificial intelligence.
 
     # Set parameters
-    'max_articles': 10,  # Maximum number of legal articles you would like to retrieve from European regulations.
+    'max_articles': 8,  # Maximum number of legal articles you would like to retrieve from European regulations.
     'threshold': 0.5,    # Input a number between 0 and 1 to set the minimum threshold for a legal article to be retrieved. Higher number means stricter article search which is based on cosine similarity.
     'num_responses': 1,  # The number of response variations the LLM model should generate for your input query.
     'sentence_transformer_model': 'BAAI/bge-small-en-v1.5',  # The embedding model used to convert text into numerical vectors for semantic similarity calculations.
     'reranker_model': 'sentence-transformers/all-MiniLM-L6-v2',  # The reranking model that re-evaluates and ranks the retrieved legal articles based on their relevance to your query.
-    'openai_model': 'gpt-3.5-turbo',  # The Large Language Model which receives the retrieved articles and generates the prompt, e.g.: "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"...
-    'max_tokens': 3000,  # Sets the upper limit on the length of the generated response, measured in tokens.
+    'openai_model': 'gpt-3.5-turbo-16k',  # The Large Language Model which receives the retrieved articles and generates the prompt, e.g.: "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"...
+    'max_tokens': 5000,  # Sets the upper limit on the length of the generated response, measured in tokens.
     'temperature': 0.5,  # Number between 0 and 1 that controls the randomness of the model's responses.
     # Lower values produce more focused and deterministic answers, while higher values result in more creative and varied outputs.
     'prompt_template': '''

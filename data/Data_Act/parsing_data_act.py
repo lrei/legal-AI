@@ -62,7 +62,6 @@ def replace_apostrophes(text):
 def normalize_text(text):
     return re.sub(r'[:,]', ' ', text).lower().strip()
 
-# Function to split at numbered parentheses followed by space and apostrophe (used only for Article 2)
 def split_at_numbered_parentheses(text):
     pattern = r'(?=\(\d+\)\s\')'
     split_text = re.split(pattern, text)

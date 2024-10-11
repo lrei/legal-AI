@@ -103,7 +103,7 @@ def process_regulation(choice, tokenizer, model):
         embedding = embed_paragraph(content, tokenizer, model)
         embedding = embedding / np.linalg.norm(embedding)
 
-        # Insert into SQLite database (without the embedding)
+        # Insert into SQLite database 
         c.execute('INSERT INTO embeddings (regulation, chapter, article, passage, content) VALUES (?, ?, ?, ?, ?)',
                   (regulation, chapter, article, passage, content))
         id_value = c.lastrowid
