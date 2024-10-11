@@ -7,7 +7,7 @@ AI Legal Assistant is a tool used for processing and analyzing legal texts relat
 - scraping data from 4 AI related European regulations (European Artifical Intelligence Act, Data Act, Data Governance act and the GDPR) and parsing it into overlapping passages,
 - embedding passages, storing the metadata in SQL databases and storing the embeddings separately in LanceDB files,
 - creating a script that retrieves top k most relevant articles above a certain threshold using a similarity search 
-- running the website on localhost which constructs a prompt based on the user query and the retrieved articles which is then sent to GPT 3.5. 
+- running the website on localhost which constructs a prompt based on the user query and the retrieved articles which is then sent to GPT-3.5 Turbo. 
 
 ## Project Workflow
 
@@ -94,12 +94,12 @@ The script captures the input and runs the external script [`retrieving_articles
 - Requires Python 3.7 or higher.
 
 ### b. Required Packages
-- **Flask**: Web application framework.
+- **Uvicorn**: Web server implementation for Python.
 
 Install required package using pip:
 
 ```bash
-pip install flask 
+pip install uvicorn 
 ```
 ### c. Clone the repository locally
 - Clone the repository from GitHub:
@@ -107,21 +107,24 @@ pip install flask
 git clone https://github.com/makov3c/legal-AI.git
 ```
 ## Usage Instructions
-1. **Navigate to the cloned repository and run the Flask app**:
+1. **Navigate to the cloned repository and run the Uvicorn application locally**:
   ```bash
   cd legal-AI
-  python app.py
+  cd app-public
+  python app_public.py
   ```
 After running the file you should see this message
 
-![message](https://github.com/user-attachments/assets/8fd1eb7b-e8a2-4979-b893-d15c8f06d9de)
+![uvicorn](https://github.com/user-attachments/assets/8fd1eb7b-e8a2-4979-b893-d15c8f06d9de)
 
 2. **Access the Interface**:
-   - Open your web browser and go to `http://127.0.0.1:5000/`.
+   - Open your web browser and go to `http://127.0.0.1:8001/`.
    - Enter your query in the provided form.
+   - Enter your OpenAI API key in the provided form.
+   - Press submit.
 
 3. **Output**:
-   - After submitting your query, view the constructed prompt and the response provided by GPT 3.5.
+   - After submitting your query, view the constructed prompt that contains all relevant retrieved articles along with the response provided by GPT-3.5 Turbo.
    
    ![query](https://github.com/user-attachments/assets/c6610178-3ba2-4056-863b-1c9e94f17802)
 

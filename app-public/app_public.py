@@ -1,5 +1,5 @@
 ### App version accessible to a public user - default parameters used.
-### Start the app by running this Python file or via cmd. 
+### Start the app by running this Python file or via cmd.
 
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 import yaml
 import uvicorn
 import llm
+from examples import examples  # Import the updated examples
 
 # Load configuration from the config file
 with open('app-public/config_public.yaml', 'r') as f:
@@ -18,7 +19,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Set the templates directory to 'app-user'
 templates = Jinja2Templates(directory="app-public")
 
 def get_chatgpt_response(prompt, max_tokens, model_name, num_responses, temperature, api_key):
@@ -49,7 +49,6 @@ def get_chatgpt_response(prompt, max_tokens, model_name, num_responses, temperat
             responses.append("")
     return responses
 
-
 def retrieve_chunks(query_text, max_articles, threshold, sentence_transformer_model, reranker_model):
     from retrieving_articles import retrieve_articles
     articles = retrieve_articles(
@@ -63,7 +62,8 @@ def retrieve_chunks(query_text, max_articles, threshold, sentence_transformer_mo
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    return templates.TemplateResponse('ui_public.html', {'request': request, 'config': config})
+    # Pass 'examples' to the template
+    return templates.TemplateResponse('ui_public.html', {'request': request, 'config': config, 'examples': examples})
 
 @app.post("/query")
 def query(
@@ -134,6 +134,7 @@ def query(
             'error_message': error_message
         })
     else:
+        # Pass 'examples' to the template
         return templates.TemplateResponse(
             'ui_public.html',
             {
@@ -142,9 +143,11 @@ def query(
                 'prompt': prompt,
                 'responses': responses,
                 'config': config,
-                'error_message': error_message
+                'error_message': error_message,
+                'examples': examples
             }
         )
 
 if __name__ == '__main__':
     uvicorn.run(app, host="127.0.0.1", port=8001)
+

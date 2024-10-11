@@ -28,11 +28,9 @@
             right: 880px;
             width: 380px;
         }
-
         .api-key-container {
             margin-top: 10px;
         }
-    
         .examples-container {
             display: flex;
             flex-wrap: wrap;
@@ -48,6 +46,21 @@
         .clickable-dots {
             font-weight: bold;
             cursor: pointer;
+        }
+        .source-link {
+            font-size: smaller;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .source-link a {
+            color: black;  
+            text-decoration: none;
+        }
+        .source-link a:hover {
+            text-decoration: underline;
+        }
+        .more-content {
+            display: none;
         }
     </style>
 </head>
@@ -69,7 +82,7 @@
         <!-- API Key input -->
         <div class="api-key-container">
             <label for="api_key">API Key:</label><br>
-            <input type="password" id="api_key" name="api_key" size="97" required value="{{ api_key }}"><br><br>
+            <input type="password" id="api_key" name="api_key" size="97" required><br><br>
         </div>
 
         <button type="submit" style="padding: 5px 5px; font-size: 15px;">Submit</button>
@@ -79,71 +92,22 @@
         <div>
             <h2>Example Queries:</h2>
             <div class="examples-container">
-                <!-- Example 1 -->
+                {% for example in examples %}
                 <div class="example-box">
                     <p>
-                        {{ "In a situation where an AI-powered medical diagnostic tool provides a misdiagnosis, who is legally responsible for the error?"[:80] }}
-                        <span id="dots-1" class="clickable-dots" onclick="toggleExample('1')">...</span>
-                        <span id="more-1" style="display: none;">
-                            {{ "In a situation where an AI-powered medical diagnostic tool provides a misdiagnosis, who is legally responsible for the error?"[80:] }}
+                        {{ example.short }}
+                        {% if example.rest %}
+                        <span id="dots-{{ loop.index }}" class="clickable-dots" onclick="toggleExample('{{ loop.index }}')">...</span>
+                        <span id="more-{{ loop.index }}" style="display: none;">
+                            <span id="text-{{ loop.index }}">{{ example.rest }}</span>
+                            <p class="source-link">
+                                <a href="{{ example.source }}" id="source-{{ loop.index }}" target="_blank" style="display:none;">Source</a>
+                            </p>
                         </span>
+                        {% endif %}
                     </p>
                 </div>
-
-                <!-- Example 2 -->
-                <div class="example-box">
-                    <p>
-                        {{ "How does the GDPR apply to machine learning algorithms that process personal data for predictive analytics?"[:80] }}
-                        <span id="dots-2" class="clickable-dots" onclick="toggleExample('2')">...</span>
-                        <span id="more-2" style="display: none;">
-                            {{ "How does the GDPR apply to machine learning algorithms that process personal data for predictive analytics?"[80:] }}
-                        </span>
-                    </p>
-                </div>
-
-                <!-- Example 3 -->
-                <div class="example-box">
-                    <p>
-                        {{ "What are the legal implications of deploying autonomous drones for surveillance without explicit consent from individuals?"[:80] }}
-                        <span id="dots-3" class="clickable-dots" onclick="toggleExample('3')">...</span>
-                        <span id="more-3" style="display: none;">
-                            {{ "What are the legal implications of deploying autonomous drones for surveillance without explicit consent from individuals?"[80:] }}
-                        </span>
-                    </p>
-                </div>
-
-                <!-- Example 4 -->
-                <div class="example-box">
-                    <p>
-                        {{ "Can an AI system be considered an inventor under current intellectual property laws if it creates a novel invention?"[:80] }}
-                        <span id="dots-4" class="clickable-dots" onclick="toggleExample('4')">...</span>
-                        <span id="more-4" style="display: none;">
-                            {{ "Can an AI system be considered an inventor under current intellectual property laws if it creates a novel invention?"[80:] }}
-                        </span>
-                    </p>
-                </div>
-
-                <!-- Example 5 -->
-                <div class="example-box">
-                    <p>
-                        {{ "What are the employer's liabilities if an AI-powered recruitment tool discriminates against certain candidates?"[:80] }}
-                        <span id="dots-5" class="clickable-dots" onclick="toggleExample('5')">...</span>
-                        <span id="more-5" style="display: none;">
-                            {{ "What are the employer's liabilities if an AI-powered recruitment tool discriminates against certain candidates?"[80:] }}
-                        </span>
-                    </p>
-                </div>
-
-                <!-- Example 6 -->
-                <div class="example-box">
-                    <p>
-                        {{ "How does the use of AI in autonomous vehicles impact legal accountability in the event of a traffic violation or accident?"[:80] }}
-                        <span id="dots-6" class="clickable-dots" onclick="toggleExample('6')">...</span>
-                        <span id="more-6" style="display: none;">
-                            {{ "How does the use of AI in autonomous vehicles impact legal accountability in the event of a traffic violation or accident?"[80:] }}
-                        </span>
-                    </p>
-                </div>
+                {% endfor %}
             </div>
         </div>
         {% endif %}
@@ -175,13 +139,16 @@
     function toggleExample(id) {
         var dots = document.getElementById("dots-" + id);
         var moreText = document.getElementById("more-" + id);
+        var sourceLink = document.getElementById("source-" + id);
 
         if (dots.style.display === "none") {
             dots.style.display = "inline";
             moreText.style.display = "none";
+            sourceLink.style.display = "none"; 
         } else {
             dots.style.display = "none";
             moreText.style.display = "inline";
+            sourceLink.style.display = "inline";  
         }
     }
     </script>
