@@ -3,11 +3,16 @@
 
 ## Introduction
 
-AI Legal Assistant is a tool used for processing and analyzing legal texts related to AI with the help of a RAG application that we have developed. The project workflow consists of 4 main stages:
-- scraping data from 4 AI related European regulations (European Artifical Intelligence Act, Data Act, Data Governance act and the GDPR) and parsing it into overlapping passages,
-- embedding passages, storing the metadata in SQL databases and storing the embeddings separately in LanceDB files,
-- creating a script that retrieves top k most relevant articles above a certain threshold using a similarity search 
-- running the website on localhost which constructs a prompt based on the user query and the retrieved articles which is then sent to GPT-3.5 Turbo. 
+AI Legal Assistant is a tool for processing and analyzing legal documents related to artificial intelligence. It functions as a Retrieval-Augmented Generation (RAG) application.
+
+The project workflow consists of four main stages:
+
+- Data Collection: Scraping data from four AI-related European regulations (European Artificial Intelligence Act, Data Act, Data Governance Act, and the General Data Protection Regulation) and parsing it into overlapping passages.
+- Embedding and Storage: Embedding passages, storing the metadata in SQLite databases, and storing the embeddings separately in LanceDB vector database files.
+- Article Retrieval: Implementing an article retrieval system that retrieves the most relevant articles above a certain similarity threshold using vector similarity search.
+- Web Application Development: Developing a web application that constructs a prompt based on the user's query and the retrieved articles, which is then sent to GPT-3.5 Turbo. Both the articles and the LLM response are displayed on the website.
+
+You are required to have a valid OpenAI API key to use this application and generate responses.
 
 ## Project Workflow
 
@@ -15,7 +20,7 @@ AI Legal Assistant is a tool used for processing and analyzing legal texts relat
 
 #### Web Scraping
 #### Overview
-The initial step involves scraping official websites of the mentioned European regulations to collect their whole content. Each regulation has its own subfolder within the `data` directory. Within each subfolder there exists a scraping script (e.g. [`data/AI_Act/parsing_ai_act.py`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/parsing_ai_act.py)) that extracts the content from the regulation and stores the output in a JSON file within the same folder (e.g. [`data/AI_Act/ai_act.json`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/ai_act.json)). 
+The initial step involves scraping official websites of the mentioned European regulations to collect their whole content. Each regulation has its own subfolder within the `data` directory. Within each subfolder there exists a scraping script (e.g. [`parsing_ai_act.py`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/parsing_ai_act.py)) that extracts the content from the regulation and stores the output in a JSON file within the same folder (e.g. [`ai_act.json`](https://github.com/makov3c/legal-AI/blob/main/data/AI_Act/ai_act.json)). 
 
 #### Workflow
 1. **Requesting Pages**: Sends HTTP GET requests for each article.
@@ -33,8 +38,8 @@ After scraping the content, the legal texts are parsed into smaller, manageable 
 
 ### 2. Embedding and database creation
 #### Overview
-[`embed_store_data.py`](https://github.com/makov3c/legal-AI/blob/main/embed_store_data.py) is an interactive file that has 3 main fuctions: 
-- merging the 4 existing JSONs into one -    [`data/Merged/merged.json](https://github.com/makov3c/legal-AI/blob/main/data/Merged/merged.json),
+[`embed_store_data.py`](https://github.com/makov3c/legal-AI/blob/main/embed_store_data.py) is an interactive script that has three main fuctions: 
+- merging the four existing JSONs into one -    [`data/Merged/merged.json`](https://github.com/makov3c/legal-AI/blob/main/data/Merged/merged.json),
 - embedding each passage,
 - storing metadata and embeddings. 
 
@@ -42,7 +47,7 @@ After scraping the content, the legal texts are parsed into smaller, manageable 
 Each passage is encoded into a high-dimensional vector (embedding) using a pre-trained language model:
 
 - **Model Used**: [`BAAI/bge-small-en`](https://huggingface.co/BAAI/bge-small-en), which is especially suitable for generating embeddings that capture a semantic meaning.
-- **Normalization**: Embeddings are normalized to unit length so we can later on compute the cosine similarity of each article. 
+- **Normalization**: Embeddings are normalized to unit length to enable the computation of cosine similarity of each article.                   
 
 #### Storing Metadata and Embeddings 
 To optimize storage and retrieval efficiency, embeddings and metadata are stored separately:
@@ -57,12 +62,12 @@ To optimize storage and retrieval efficiency, embeddings and metadata are stored
 
 ### 3. Article Retrieval
 #### Overview
-[`retrieving_articles.py`](https://github.com/makov3c/legal-AI/blob/main/retrieving_articles.py) is a script that retrieves the most relevant articles in regards to the provided user query which are then displayed on the website.
+[`retrieving_articles.py`](https://github.com/makov3c/legal-AI/blob/main/app-public/retrieving_articles.py) is a script that retrieves the most relevant articles with respect to the user's query by comparing their cosine similarity.
 
 #### Workflow
 
 #### 1. Query Embedding Generation
-The user's query is first normalized using the same pre-trained language model, BGE small, to generate an embedding that is comparable to other embeddings stored in the LanceDB vector database.
+The user's query is first normalized using the same pre-trained language model to generate an embedding that is comparable to other embeddings stored in the LanceDB vector database.
 
 #### 2. Similarity Search in LanceDB
 - **Similarity Calculation**: The user query embedding is compared against stored passage embeddings using [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity).
@@ -71,7 +76,7 @@ The user's query is first normalized using the same pre-trained language model, 
 #### 3. Filtering Candidate Passages and Re-ranking model 
 - Retrieves metadata for each candidate passage from the SQLite database.
 - Creates input pairs of [query_text, passage_text] for each candidate passage which are necessary inptus for the re-ranking model. 
-- [The Cross-Encoder model MS Marco](https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-6-v2) computes a relevance score for each query-passage pair. It provides a more accurate assessment of relevance by considering the context and semantics of both texts together.
+- Using a model from sentence-transformers, [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), to compute a relevance score for each query-passage pair. It provides a more accurate assessment of relevance by considering the context and semantics of both texts together.
 
 #### 4. Presenting the Top Results
 - Selects the top k passages based on the re-ranked scores.
@@ -85,29 +90,52 @@ The user's query is first normalized using the same pre-trained language model, 
 
 ### 4. Web Application and LLM Integration
 #### Overview
-By running [`app.py`](https://github.com/makov3c/legal-AI/blob/main/app.py) you are able to run the website on localhost. It provides a Flask wesbsite with a minimalistic user interface that accepts a user query.
-The script captures the input and runs the external script [`retrieving_articles.py`](https://github.com/makov3c/legal-AI/blob/main/retrieving_articles.py) to fetch relevant text chunks and assemble a detailed prompt incorporating the user's query and the retrieved context. This prompt is then sent to the ChatGPT model to generate a response. The script concludes by displaying the constructed prompt and the generated response, providing both for review.
+There are two versions of the web application:
+
+1. Public version [app_public.py](https://github.com/makov3c/legal-AI/blob/main/app-public/app_public.py): Designed for public users, this version uses default parameters and provides a user-friendly interface. Users can input their legal queries and receive responses without needing to configure any settings. An OpenAI API key is required to generate responses.
+
+2. Testing version [app_testing.py](https://github.com/makov3c/legal-AI/blob/main/app-testing/app_testing.py): Intended for testing and development purposes, this version allows users to configure various parameters such as the OpenAI model to use, maximum tokens, number of responses, temperature, and models for sentence embedding and re-ranking. Users can also choose to store their API key for the session in order to make mass generating an easier task. 
+
+Both applications use FastAPI for handling web requests and Uvicorn as the ASGI server. They share similar workflows for processing user queries and generating responses.
+
+#### Workflow
+#### User Input:
+Users enter their legal query and OpenAI API key in the provided form. 
+
+#### Article Retrieval:
+The application uses the retrieving_articles.py script to fetch relevant legal passages based on the user's query.
+A prompt template is used to incorporate both the user's query and the retrieved context.
+The prompt is formatted to guide the language model in generating an appropriate response.
+
+#### LLM Response Generation:
+
+The constructed prompt is sent to the OpenAI language model (GPT-3.5 Turbo) to generate a response.
+The application uses the OpenAI API, with the user's API key, to obtain the response from the model.
+
+#### Displaying Results:
+The user's query, the retrieved articles, the constructed prompt, and the LLM's response are displayed on the web interface.
+
 
 ## Dependencies and Installation
 
 ### a. Python Version
 - Requires Python 3.7 or higher.
 
-### b. Required Packages
-- **Uvicorn**: Web server implementation for Python.
-
-Install required package using pip:
-
-```bash
-pip install uvicorn 
-```
-### c. Clone the repository locally
+### b. Clone the repository locally
 - Clone the repository from GitHub:
 ```bash
 git clone https://github.com/makov3c/legal-AI.git
 ```
+
+### c. Required Packages
+Install required packages using pip:
+
+```bash
+pip install -r package_requirements.txt
+```
+
 ## Usage Instructions
-1. **Navigate to the cloned repository and run the Uvicorn application locally**:
+1. Navigate to the cloned repository and run the Uvicorn application locally:
   ```bash
   cd legal-AI
   cd app-public
@@ -117,14 +145,10 @@ After running the file you should see this message
 
 ![uvicorn](https://github.com/user-attachments/assets/8fd1eb7b-e8a2-4979-b893-d15c8f06d9de)
 
-2. **Access the Interface**:
+2. Access the Interface:
    - Open your web browser and go to `http://127.0.0.1:8001/`.
    - Enter your query in the provided form.
    - Enter your OpenAI API key in the provided form.
-   - Press submit.
+   - Press submit and view the results.
 
-3. **Output**:
-   - After submitting your query, view the constructed prompt that contains all relevant retrieved articles along with the response provided by GPT-3.5 Turbo.
-   
-   ![query](https://github.com/user-attachments/assets/c6610178-3ba2-4056-863b-1c9e94f17802)
 

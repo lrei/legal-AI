@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+jinja2
+starlette
+PyYAML
+llm
+sentence-transformers
+lancedb
+openai
