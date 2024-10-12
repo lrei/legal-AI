@@ -49,6 +49,16 @@ def get_chatgpt_response(prompt, max_tokens, model_name, num_responses, temperat
             responses.append("")
     return responses
 
+def format_article_title(articles):
+    formatted_articles = []
+    for article in articles:
+        lines = article.split('\n')
+        if len(lines) >= 3:
+            # Make the third line (article title) bold
+            lines[2] = f"<strong>{lines[2]}</strong>"
+        formatted_articles.append('\n'.join(lines))
+    return formatted_articles
+
 def retrieve_chunks(query_text, max_articles, threshold, sentence_transformer_model, reranker_model):
     from retrieving_articles import retrieve_articles
     articles = retrieve_articles(
@@ -58,11 +68,14 @@ def retrieve_chunks(query_text, max_articles, threshold, sentence_transformer_mo
         sentence_transformer_model=sentence_transformer_model,
         reranker_model=reranker_model
     )
-    return articles
+    
+    # Format article titles (make third line bold)
+    formatted_articles = format_article_title(articles)
+    
+    return formatted_articles
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    # Pass 'examples' to the template
     return templates.TemplateResponse('ui_public.html', {'request': request, 'config': config, 'examples': examples})
 
 @app.post("/query")

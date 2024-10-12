@@ -3,137 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Legal Assistant</title>
-    <style>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for GitHub Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>                                     
+        /* Apply gradient to full page height */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0f2, #d2d2ec); /* Light blue gradient */
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             margin: 10px;
         }
+
         pre {
-            font-family: Arial, sans-serif;
             font-size: 14px;
             white-space: pre-wrap;
         }
+
         .response {
-            border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 10px;
         }
+
         .error {
             color: red;
         }
+
         .top-right-image {
             position: absolute;
-            top: 30px;
-            right: 880px;
-            width: 380px;
+            top: 15px;
+            right: 570px;
+            width: 350px;
         }
-        .api-key-container {
-            margin-top: 10px;
-        }
-        .examples-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .example-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            width: calc(50% - 10px); 
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
+
         .clickable-dots {
             font-weight: bold;
             cursor: pointer;
         }
+
         .source-link {
-            font-size: smaller;
+            font-size: 14px;
             font-style: italic;
             margin-top: 5px;
         }
+
         .source-link a {
-            color: black;  
+            color: black;
             text-decoration: none;
         }
+
         .source-link a:hover {
             text-decoration: underline;
         }
-        .more-content {
-            display: none;
+
+        /* GitHub Button Custom Style */
+        .github-button {
+            border: 1px solid #d1d5db;
+            padding: 10px 20px;
+            background-color: white;
+            color: #333;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .github-button:hover {
+            background-color: #f5f5f5;
+            border-color: #c6cbd1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .github-button i {
+            margin-right: 4px;
+        }
+
+        /* Styling for white text boxes */
+        .white-box {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Smaller title for Sample Queries */
+        h2.sample-queries-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Custom styling for the cards */
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Smaller text within the cards */
+        .card-text {
+            font-size: 0.9rem;
+        }
+
+        /* Input Fields */
+        input[type="text"], input[type="password"], textarea {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Submit Button */
+        button {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
 
-    <img src="https://www.eitmanufacturing.eu/wp-content/uploads/2021/10/JSI-Logo-002.jpg" alt="JSI Logo" class="top-right-image">
+    <div class="container mt-4">
+        <a href="https://www.your-link-here.com" target="_blank">
+            <img src="https://eseia.eu/wp-content/uploads/2021/09/JSI-e1631518902710.png" alt="JSI Logo" class="top-right-image">
+        </a>
 
-    <h1>AI Legal Assistant</h1>
+        <h1 class="mb-4">AI Legal Assistant</h1>
 
-    <!-- Form submission -->
-    <form action="/query" method="post">
-        <div>
-            <label for="query" style="margin-bottom: -20px; display: block;">
-                Provide details about your legal matter involving artificial intelligence:
-            </label><br>
-            <textarea id="query" name="query" rows="10" cols="90" required style="margin-top: 3px;"></textarea><br><br>
+        <!-- Form submission -->
+        <form action="/query" method="post">
+            <div class="mb-3">
+                <label for="query" class="form-label">
+                    Please provide details about your legal concern involving artificial intelligence:
+                </label>
+                <textarea id="query" name="query" rows="5" class="form-control" required></textarea>
+            </div>
+
+            <!-- API Key input -->
+            <div class="mb-3">
+                <label for="api_key" class="form-label">API Key:</label>
+                <input type="password" id="api_key" name="api_key" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-4">Submit</button>
+        </form>
+
+        {% if user_query %}
+        <!-- Submitted Query -->
+        <div class="white-box">
+            <h2>Submitted Query:</h2>
+            <p>{{ user_query }}</p>
         </div>
 
-        <!-- API Key input -->
-        <div class="api-key-container">
-            <label for="api_key">API Key:</label><br>
-            <input type="password" id="api_key" name="api_key" size="97" required><br><br>
+        <!-- Constructed Prompt -->
+        <div class="white-box">
+            <h2>Constructed Prompt:</h2>
+            <pre>{{ prompt | safe }}</pre> <!-- Use the 'safe' filter here -->
         </div>
 
-        <button type="submit" style="padding: 5px 5px; font-size: 15px;">Submit</button>
+        <!-- Response from the Assistant -->
+        <div class="white-box">
+            <h2>Response from the Assistant:</h2>
+            {% for response in responses %}
+            <div class="response">
+                <pre>{{ response }}</pre>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         {% if not user_query %}
         <!-- Section with query examples (Visible only when no query is submitted) -->
         <div>
-            <h2>Example Queries:</h2>
-            <div class="examples-container">
+            <h2 class="sample-queries-title">Sample Queries:</h2>
+            <div class="row">
                 {% for example in examples %}
-                <div class="example-box">
-                    <p>
-                        {{ example.short }}
-                        {% if example.rest %}
-                        <span id="dots-{{ loop.index }}" class="clickable-dots" onclick="toggleExample('{{ loop.index }}')">...</span>
-                        <span id="more-{{ loop.index }}" style="display: none;">
-                            <span id="text-{{ loop.index }}">{{ example.rest }}</span>
-                            <p class="source-link">
-                                <a href="{{ example.source }}" id="source-{{ loop.index }}" target="_blank" style="display:none;">Source</a>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p class="card-text">
+                                "{{ example.short }}
+                                {% if example.rest %}
+                                <span id="dots-{{ loop.index }}" class="clickable-dots" onclick="toggleExample('{{ loop.index }}')">...</span>
+                                <span id="more-{{ loop.index }}" style="display: none;">
+                                    {{ example.rest }}"
+                                    <p class="source-link">
+                                        <a href="{{ example.source }}" id="source-{{ loop.index }}" target="_blank" style="display:none;">Source</a>
+                                    </p>
+                                </span>
+                                {% endif %}
                             </p>
-                        </span>
-                        {% endif %}
-                    </p>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
-    </form>
 
-    {% if error_message %}
-        <div class="error">
+        {% if error_message %}
+        <div class="alert alert-danger" role="alert">
             <p>{{ error_message }}</p>
         </div>
-    {% endif %}
+        {% endif %}
 
-    {% if user_query %}
-        <h2>Submitted Query:</h2>
-        <p>{{ user_query }}</p>
+        <!-- Centered GitHub Button -->
+        <div class="d-flex justify-content-center mt-5">
+            <a href="https://github.com/makov3c/legal-AI" class="github-button">
+                <i class="fab fa-github"></i> Open-Sourced on GitHub
+            </a>
+        </div>
 
-        <!-- Constructed Prompt Section (Visible only after a query is submitted) -->
-        <h2>Constructed Prompt:</h2>
-        <pre>{{ prompt }}</pre>
+    </div>
 
-        <h2>Responses from the Assistant:</h2>
-        {% for response in responses %}
-            <div class="response">
-                <pre>{{ response }}</pre>
-            </div>
-        {% endfor %}
-    {% endif %}
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
     function toggleExample(id) {
@@ -144,11 +261,11 @@
         if (dots.style.display === "none") {
             dots.style.display = "inline";
             moreText.style.display = "none";
-            sourceLink.style.display = "none"; 
+            sourceLink.style.display = "none";
         } else {
             dots.style.display = "none";
             moreText.style.display = "inline";
-            sourceLink.style.display = "inline";  
+            sourceLink.style.display = "inline";
         }
     }
     </script>

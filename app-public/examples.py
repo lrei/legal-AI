@@ -37,7 +37,7 @@ examples_raw = list(zip(example_texts, sources))
 examples = []
 
 for idx, (text, source) in enumerate(examples_raw, start=1):
-    short_text, remaining_text = truncate_text(text, 80)
+    short_text, remaining_text = truncate_text(text, 175)
     examples.append({
         'short': short_text,
         'rest': remaining_text,
