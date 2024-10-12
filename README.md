@@ -92,7 +92,8 @@ The user's query is first normalized using the same pre-trained language model t
 #### Overview
 There are two versions of the web application:
 
-1. Public version [app_public.py](https://github.com/makov3c/legal-AI/blob/main/app-public/app_public.py): Designed for public users, this version uses default parameters and provides a user-friendly interface. Users can input their legal queries and receive responses without needing to configure any settings. An OpenAI API key is required to generate responses.
+1. Public version [app_public.py](https://github.com/makov3c/legal-AI/blob/main/app-public/app_public.py): Designed for public users, this version uses default parameters and provides a user-friendly interface. Users can input their legal queries and receive responses without needing to configure any settings. An OpenAI API key is required to generate responses. 
+At the bottom of the page there are six example queries from real articles that were picked carefully to illustrate how a query should be worded in order to receive an accurate responsef from the LLM. 
 
 2. Testing version [app_testing.py](https://github.com/makov3c/legal-AI/blob/main/app-testing/app_testing.py): Intended for testing and development purposes, this version allows users to configure various parameters such as the OpenAI model to use, maximum tokens, number of responses, temperature, and models for sentence embedding and re-ranking. Users can also choose to store their API key for the session in order to make mass generating an easier task. 
 
