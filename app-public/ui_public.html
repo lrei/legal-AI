@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Legal Assistant</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome for GitHub Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>                                     
-        /* Apply gradient to full page height */
         html, body {
             margin: 0;
             padding: 0;
             height: 100%;
-            background: linear-gradient(135deg, #e0e0f2, #d2d2ec); /* Light blue gradient */
+            background: linear-gradient(135deg, #e0e0f2, #d2d2ec);
         }
 
         body {
@@ -91,7 +87,6 @@
             margin-right: 4px;
         }
 
-        /* Styling for white text boxes */
         .white-box {
             background-color: white;
             padding: 15px;
@@ -100,13 +95,11 @@
             margin-bottom: 20px;
         }
 
-        /* Smaller title for Sample Queries */
         h2.sample-queries-title {
             font-size: 1.5rem;
             font-weight: 600;
         }
 
-        /* Custom styling for the cards */
         .card {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border: 1px solid #e0e0e0;
@@ -118,12 +111,10 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* Smaller text within the cards */
         .card-text {
             font-size: 0.9rem;
         }
 
-        /* Input Fields */
         input[type="text"], input[type="password"], textarea {
             border-radius: 8px;
             border: 1px solid #ddd;
@@ -174,7 +165,7 @@
 
             <!-- API Key input -->
             <div class="mb-3">
-                <label for="api_key" class="form-label">API Key:</label>
+                <label for="api_key" class="form-label"><strong>OpenAI API Key:</strong></label>
                 <input type="password" id="api_key" name="api_key" class="form-control" required>
             </div>
 
@@ -191,7 +182,7 @@
         <!-- Constructed Prompt -->
         <div class="white-box">
             <h2>Constructed Prompt:</h2>
-            <pre>{{ prompt | safe }}</pre> <!-- Use the 'safe' filter here -->
+            <pre>{{ prompt | safe }}</pre>
         </div>
 
         <!-- Response from the Assistant -->

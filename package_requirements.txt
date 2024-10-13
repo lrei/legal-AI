@@ -7,3 +7,6 @@ llm
 sentence-transformers
 lancedb
 openai
+python-multipart
+numpy
+transformers

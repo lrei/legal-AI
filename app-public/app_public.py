@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 import yaml
 import uvicorn
 import llm
-from examples import examples  # Import the updated examples
+from examples import examples
 
 # Load configuration from the config file
 with open('app-public/config_public.yaml', 'r') as f:
