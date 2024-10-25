@@ -169,4 +169,10 @@ docker run -d -p 8001:8001 --name legal-ai-container legal-ai-app
 ```
 
 4. Open the Docker Destop app and click on Containers. Click on "legal-ai-container" and start the container. 
+
+![docker](https://github.com/user-attachments/assets/13817248-6948-4389-9d77-c61820c2d7a2)
+
 5. Access the interface on [http://localhost:8001/](http://localhost:8001/).
+
+![ai_interface](https://github.com/user-attachments/assets/8259c907-afb5-4724-a170-3be874d71821)
+
