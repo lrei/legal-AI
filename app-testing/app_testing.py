@@ -26,8 +26,8 @@ app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 templates = Jinja2Templates(directory="app-testing")
 
 def get_chatgpt_response(prompt, max_tokens, model_name, num_responses, temperature, api_key):
-    # Set the OpenAI API key for llm
-    llm.api_key = api_key
+    # Set the OpenAI API key as an environment variable
+    os.environ["OPENAI_API_KEY"] = api_key
 
     try:
         model = llm.get_model(model_name)
@@ -45,7 +45,7 @@ def get_chatgpt_response(prompt, max_tokens, model_name, num_responses, temperat
                 max_tokens=max_tokens,
                 temperature=temperature
             )
-        
+
             cleaned_text = response.text().strip().replace('```', '')
             responses.append(cleaned_text)
         except Exception as e:

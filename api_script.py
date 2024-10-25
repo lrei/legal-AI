@@ -29,7 +29,7 @@ data = {
     # A custom prompt template that structures the input for the language model to generate responses.
     # In the prompt you can position the retrieved articles with {context} and your query with {user_query} if needed.
 }
-# Switching the embedding, reranker or LLM model might require some tweaking of the code in app.py in order to work properly. 
+# Switching the embedding, reranker or LLM model might require some tweaking of the code in app_testing.py in order for it to work properly. 
 # Embedding models: https://huggingface.co/models?other=embeddings.
 # Reranker models: https://huggingface.co/models?other=reranker.
 # LLM models: https://llm.datasette.io/en/stable/openai-models.html, https://llm.datasette.io/en/stable/other-models.html.

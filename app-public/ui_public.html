@@ -36,7 +36,7 @@
         .top-right-image {
             position: absolute;
             top: 15px;
-            right: 570px;
+            right: 450px;
             width: 350px;
         }
 
@@ -148,14 +148,16 @@
 <body>
 
     <div class="container mt-4">
-        <a href="https://www.your-link-here.com" target="_blank">
+        <a href="https://www.ijs.si/ijsw" target="_blank">
             <img src="https://eseia.eu/wp-content/uploads/2021/09/JSI-e1631518902710.png" alt="JSI Logo" class="top-right-image">
         </a>
 
-        <h1 class="mb-4">AI Legal Assistant</h1>
-
-        <!-- Form submission -->
-        <form action="/query" method="post">
+        <a href="http://localhost:8001/" style="text-decoration: none; color: black;">
+            <h1 class="mb-4">AI Legal Assistant</h1>
+        </a>        
+        
+        <!-- Form submission with added id -->
+        <form id="query-form" action="/query" method="post">
             <div class="mb-3">
                 <label for="query" class="form-label">
                     Please provide details about your legal concern involving artificial intelligence:
@@ -176,7 +178,7 @@
         <!-- Submitted Query -->
         <div class="white-box">
             <h2>Submitted Query:</h2>
-            <p>{{ user_query }}</p>
+            <pre>{{ user_query }}</pre>
         </div>
 
         <!-- Constructed Prompt -->
@@ -243,6 +245,7 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Existing script for toggleExample function -->
     <script>
     function toggleExample(id) {
         var dots = document.getElementById("dots-" + id);
@@ -260,5 +263,16 @@
         }
     }
     </script>
+
+    <!-- New script to handle Enter key press anywhere on the page -->
+    <script>
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevents the default behavior
+            document.getElementById('query-form').submit(); // Submits the form
+        }
+    });
+    </script>
+
 </body>
 </html>

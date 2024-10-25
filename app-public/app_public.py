@@ -8,6 +8,7 @@ import yaml
 import uvicorn
 import llm
 from examples import examples
+import os
 
 # Load configuration from the config file
 with open('app-public/config_public.yaml', 'r') as f:
@@ -22,8 +23,8 @@ app = FastAPI(
 templates = Jinja2Templates(directory="app-public")
 
 def get_chatgpt_response(prompt, max_tokens, model_name, num_responses, temperature, api_key):
-    # Set the OpenAI API key for llm
-    llm.api_key = api_key
+    # Set the OpenAI API key as an environment variable
+    os.environ["OPENAI_API_KEY"] = api_key
 
     try:
         model = llm.get_model(model_name)
@@ -162,5 +163,5 @@ def query(
         )
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="127.0.0.1", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
 
