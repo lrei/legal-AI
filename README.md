@@ -154,13 +154,13 @@ After running the file you should see this message
 
 ### - Deploying via Docker
 1. Make sure you have the [Docker Destop](https://www.docker.com/products/docker-desktop/) installed on your PC.
-2. Navigate to the cloned repository and build the Docker container:
+2. Navigate to the cloned repository and build the Docker image:
 
 ```bash
 cd legal-AI
 docker build --no-cache -t legal-ai-app .
 ```
-Building the container can take up to 10 minutes. 
+Building the image can take up to 10 minutes. 
 
 3. Create the Docker container: 
 
