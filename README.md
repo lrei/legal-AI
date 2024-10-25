@@ -120,7 +120,7 @@ The user's query, the retrieved articles, the constructed prompt, and the LLM's 
 ## Dependencies and Installation
 
 ### a. Python Version
-- Requires Python 3.7 or higher.
+- Requires Python 3.9 or higher.
 
 ### b. Clone the repository locally
 - Clone the repository from GitHub:
@@ -128,17 +128,17 @@ The user's query, the retrieved articles, the constructed prompt, and the LLM's 
 git clone https://github.com/makov3c/legal-AI.git
 ```
 
-### c. Required Packages
-Install required packages using pip:
+## Usage Instructions
+### - Running the app locally
+1. Install required packages using pip:
 
 ```bash
+cd legal-AI
 pip install -r package_requirements.txt
 ```
 
-## Usage Instructions
-1. Navigate to the cloned repository and run the Uvicorn application locally:
+2. Navigate to the cloned repository and run the Uvicorn application locally:
   ```bash
-  cd legal-AI
   cd app-public
   python app_public.py
   ```
@@ -146,10 +146,27 @@ After running the file you should see this message
 
 ![uvicorn](https://github.com/user-attachments/assets/4253e095-9779-42be-9101-f6aad1c3673b)
 
-2. Access the Interface:
-   - Open your web browser and go to `http://127.0.0.1:8001/`.
+3. Access the Interface:
+   - Open your web browser and navigate to [http://localhost:8001/](http://localhost:8001/).
    - Enter your query in the provided form.
    - Enter your OpenAI API key in the provided form.
    - Press submit and view the results.
 
+### - Deploying via Docker
+1. Make sure you have the [Docker Destop](https://www.docker.com/products/docker-desktop/) installed on your PC.
+2. Navigate to the cloned repository and build the Docker container:
 
+```bash
+cd legal-AI
+docker build --no-cache -t legal-ai-app .
+```
+Building the container can take up to 10 minutes. 
+
+3. Create the Docker container: 
+
+```bash
+docker run -d -p 8001:8001 --name legal-ai-container legal-ai-app
+```
+
+4. Open the Docker Destop app and click on Containers. Click on "legal-ai-container" and start the container. 
+5. Access the interface on [http://localhost:8001/](http://localhost:8001/).
