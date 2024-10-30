@@ -11,3 +11,4 @@ requests
 llm
 python-multipart
 pandas 
+bs4
