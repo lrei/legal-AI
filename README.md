@@ -150,7 +150,6 @@ pip install -r package_requirements.txt
 3. Run the file to access the website. 
 
 
-
 **OR**
 
 If you have all the required packages already installed on your PC:
