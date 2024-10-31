@@ -129,24 +129,42 @@ git clone https://github.com/makov3c/legal-AI.git
 ```
 
 ## Usage Instructions
-### - Running the app locally
-1. Install required packages using pip:
+### - Running the app within a virtual environment (Preferred)
+1. Navigate to the cloned repository and create a virtual Python environment:
 
 ```bash
 cd legal-AI
+python -m venv myenv
+myenv\Scripts\activate
 pip install -r package_requirements.txt
 ```
 
-2. Navigate to the cloned repository and run the Uvicorn application locally:
+2. Edit run_app.bat:
+
+- Navigate to the cloned folder and open run_app.bat file with notepad.
+- Adjust the third line with the absolute path of the same directory, for example "cd /d C:\Users\User\legal-AI".
+- Save the file.
+
+3. Run the file to access the website. 
+
+
+
+**OR**
+
+If you have all the required packages already installed on your PC:
+
+Run the Uvicorn application locally
   ```bash
+  cd legal-AI
   cd app-public
   python app_public.py
   ```
-After running the file you should see this message
+After running the file you should see this message:
 
 ![uvicorn](https://github.com/user-attachments/assets/4253e095-9779-42be-9101-f6aad1c3673b)
 
-3. Access the Interface:
+
+Access the Interface:
    - Open your web browser and navigate to [http://localhost:8001/](http://localhost:8001/).
    - Enter your query in the provided form.
    - Enter your OpenAI API key in the provided form.
