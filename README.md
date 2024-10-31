@@ -141,8 +141,8 @@ pip install -r package_requirements.txt
 
 2. Edit run_app.bat:
 
-- Navigate to the cloned folder and open run_app.bat file with notepad.
-- Adjust the third line with the absolute path of the same directory, for example "cd /d C:\Users\User\legal-AI".
+- Navigate to the cloned directory and open run_app.bat file with notepad.
+- Adjust the third line with the absolute path of your directory, for example "cd /d C:\Users\User\legal-AI".
 - Save the file.
 
 3. Run the file to access the website. 
