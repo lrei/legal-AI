@@ -144,6 +144,7 @@ pip install -r package_requirements.txt
 - Navigate to the cloned directory and open run_app.bat file with notepad.
 - Adjust the third line with the absolute path of your directory, for example "cd /d C:\Users\User\legal-AI".
 - Save the file.
+
 ![batfile](https://github.com/user-attachments/assets/9ff2885b-5988-429a-a6dc-df40e9b99633)
 
 
