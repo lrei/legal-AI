@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Legal Assistant</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Updated Font Awesome CDN link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>                                     
+    <style>
+        /* Existing CSS styles */
         html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             background: linear-gradient(135deg, #e0e0f2, #d2d2ec);
+            position: relative;
+            min-height: 100%;
         }
 
         body {
@@ -33,11 +38,18 @@
             color: red;
         }
 
-        .top-right-image {
+        /* Adjusted for multiple logos */
+        .top-right-logos {
             position: absolute;
-            top: 15px;
-            right: 250px;
-            width: 350px;
+            top: 12px;
+            right: 286px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-image {
+            width: 230px; /* Adjust the width as needed */
+            margin-left: 40px;
         }
 
         .clickable-dots {
@@ -84,7 +96,7 @@
         }
 
         .github-button i {
-            margin-right: 4px;
+            margin-right: 6px;
         }
 
         .white-box {
@@ -96,7 +108,7 @@
         }
 
         h2.sample-queries-title {
-            font-size: 1.5rem;
+            font-size: 20px;
             font-weight: 600;
         }
 
@@ -143,16 +155,70 @@
             background-color: #0056b3;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
+
+        /* Style for collapsible section headings */
+        .white-box h2 a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .white-box h2 a:hover {
+            color: black;
+            text-decoration: none;
+        }
+
+        .white-box h2 i {
+            color: black;
+        }
+
+        /* Footer Style */
+        .enrichmydata-footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            background-color: transparent;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+        }
+
+        .enrichmydata-footer img {
+            width: 100px;
+            margin-right: 10px;
+        }
+
+        .enrichmydata-footer p {
+            font-size: 12px;
+            color: #4B0082; /* Dark purple color */
+            margin: 0;
+        }
+
+        /* Adjusted margin for GitHub button */
+        .github-button-container {
+            margin-top: 0.2rem; /* Reduced from mt-5 to mt-2 */
+        }
+
+        /* Ensure content doesn't overlap the footer */
+        .content {
+            padding-bottom: 100px; /* Height of the footer */
+        }
     </style>
 </head>
 <body>
 
-    <div class="container mt-4">
-        <a href="https://www.ijs.si/ijsw" target="_blank">
-            <img src="https://eseia.eu/wp-content/uploads/2021/09/JSI-e1631518902710.png" alt="JSI Logo" class="top-right-image">
-        </a>
+    <div class="container mt-4 content">
+        <!-- Logos -->
+        <div class="top-right-logos">
+            <a href="https://ailab.ijs.si/" target="_blank">
+                <img src="https://ailab.ijs.si/wp-content/uploads/2021/05/2021_metulj-2048x486.png" alt="AI Lab Logo" class="logo-image">
+            </a>
+            <a href="https://www.ijs.si/ijsw" target="_blank">
+                <img src="https://eseia.eu/wp-content/uploads/2021/09/JSI-e1631518902710.png" alt="JSI Logo" class="logo-image">
+            </a>
+        </div>
 
-        <a href="http://localhost:8001/" style="text-decoration: none; color: black;">
+        <a href="/" style="text-decoration: none; color: black;">
             <h1 class="mb-4">AI Legal Assistant</h1>
         </a>        
         
@@ -168,25 +234,21 @@
             <!-- API Key input -->
             <div class="mb-3">
                 <label for="api_key" class="form-label"><strong>OpenAI API Key:</strong></label>
-                <input type="password" id="api_key" name="api_key" class="form-control" required>
+                <input type="password" id="api_key" name="api_key" class="form-control" value="{{ request.session.get('api_key', '') }}" required>
+            </div>
+
+            <!-- Store API Key checkbox -->
+            <div class="mb-3">
+                <label>
+                    <input type="checkbox" id="store_api_key" name="store_api_key" {% if request.session.get('api_key') %}checked{% endif %}>
+                    Store API key for this session
+                </label>
             </div>
 
             <button type="submit" class="btn btn-primary mb-4">Submit</button>
         </form>
 
         {% if user_query %}
-        <!-- Submitted Query -->
-        <div class="white-box">
-            <h2>Submitted Query:</h2>
-            <pre>{{ user_query }}</pre>
-        </div>
-
-        <!-- Constructed Prompt -->
-        <div class="white-box">
-            <h2>Constructed Prompt:</h2>
-            <pre>{{ prompt | safe }}</pre>
-        </div>
-
         <!-- Response from the Assistant -->
         <div class="white-box">
             <h2>Response from the Assistant:</h2>
@@ -196,6 +258,32 @@
             </div>
             {% endfor %}
         </div>
+
+        <!-- Submitted Query (collapsible) -->
+        <div class="white-box">
+            <h2>
+                <a data-bs-toggle="collapse" href="#submittedQuery" role="button" aria-expanded="false" aria-controls="submittedQuery" class="d-flex justify-content-between align-items-center">
+                    Submitted Query
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+            </h2>
+            <div class="collapse" id="submittedQuery">
+                <pre>{{ user_query }}</pre>
+            </div>
+        </div>
+
+        <!-- Constructed Prompt (collapsible) -->
+        <div class="white-box">
+            <h2>
+                <a data-bs-toggle="collapse" href="#constructedPrompt" role="button" aria-expanded="false" aria-controls="constructedPrompt" class="d-flex justify-content-between align-items-center">
+                    Constructed Prompt
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+            </h2>
+            <div class="collapse" id="constructedPrompt">
+                <pre>{{ prompt | safe }}</pre>
+            </div>
+        </div>
         {% endif %}
 
         {% if not user_query %}
@@ -204,20 +292,25 @@
             <h2 class="sample-queries-title">Sample Queries:</h2>
             <div class="row">
                 {% for example in examples %}
+                {% set full_query = example.short ~ ' ' ~ (example.rest or '') %}
                 <div class="col-md-6">
                     <div class="card mb-3">
                         <div class="card-body">
                             <p class="card-text">
-                                "{{ example.short }}
-                                {% if example.rest %}
-                                <span id="dots-{{ loop.index }}" class="clickable-dots" onclick="toggleExample('{{ loop.index }}')">...</span>
-                                <span id="more-{{ loop.index }}" style="display: none;">
-                                    {{ example.rest }}"
-                                    <p class="source-link">
-                                        <a href="{{ example.source }}" id="source-{{ loop.index }}" target="_blank" style="display:none;">Source</a>
-                                    </p>
+                                <span onclick="copySampleQuery('{{ loop.index }}', event)" data-full-query="{{ full_query }}" style="color: black; cursor: pointer;">
+                                    "{{ example.short }}
+                                    {% if example.rest %}
+                                    <span id="dots-{{ loop.index }}" class="clickable-dots" onclick="toggleExample('{{ loop.index }}', event)">...</span>
+                                    <span id="more-{{ loop.index }}" style="display: none;">
+                                        {{ ' ' ~ example.rest }}"
+                                        <p class="source-link">
+                                            <a href="{{ example.source }}" id="source-{{ loop.index }}" target="_blank" style="display:none;" onclick="event.stopPropagation();">Source</a>
+                                        </p>
+                                    </span>
+                                    {% else %}
+                                    "
+                                    {% endif %}
                                 </span>
-                                {% endif %}
                             </p>
                         </div>
                     </div>
@@ -226,28 +319,41 @@
             </div>
         </div>
         {% endif %}
-
+        
         {% if error_message %}
         <div class="alert alert-danger" role="alert">
             <p>{{ error_message }}</p>
         </div>
         {% endif %}
-
+        
         <!-- Centered GitHub Button -->
-        <div class="d-flex justify-content-center mt-5">
+        <div class="d-flex justify-content-center github-button-container">
             <a href="https://github.com/makov3c/legal-AI" class="github-button">
                 <i class="fab fa-github"></i> Open-Sourced on GitHub
             </a>
         </div>
-
+        
     </div>
 
+    {% if not user_query %}
+    <!-- enRichMyData Logo and Text -->
+    <div class="enrichmydata-footer">
+        <a href="https://enrichmydata.eu/" target="_blank">
+            <img src="https://enrichmydata.eu/wp-content/uploads/2023/01/enrichmydata-mark-colour-2023-f.svg" alt="enRichMyData Logo">
+        </a>
+        <p>
+            enRichMyData develops a novel paradigm for building rich, high-quality and valuable datasets to feed Big Data Analytics and AI applications. It has received funding from the European Union’s Horizon Europe research and innovation programme under grant agreement No 101070284.
+        </p>
+    </div>
+    {% endif %}
+    
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     <!-- Existing script for toggleExample function -->
     <script>
-    function toggleExample(id) {
+    function toggleExample(id, event) {
+        event.stopPropagation();
         var dots = document.getElementById("dots-" + id);
         var moreText = document.getElementById("more-" + id);
         var sourceLink = document.getElementById("source-" + id);
@@ -262,8 +368,18 @@
             sourceLink.style.display = "inline";
         }
     }
-    </script>
 
+    function copySampleQuery(id, event) {
+        var element = event.currentTarget;
+        var fullQuery = element.getAttribute('data-full-query');
+        
+        // Copy the text to the clipboard
+        navigator.clipboard.writeText(fullQuery).catch(function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+    </script>
+    
     <!-- New script to handle Enter key press anywhere on the page -->
     <script>
     document.addEventListener('keydown', function (e) {
@@ -274,5 +390,28 @@
     });
     </script>
 
+    <!-- Script to toggle chevron icons in collapsible sections -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var collapsibleLinks = document.querySelectorAll('.white-box h2 a[data-bs-toggle="collapse"]');
+
+        collapsibleLinks.forEach(function(link) {
+            var targetId = link.getAttribute('href');
+            var target = document.querySelector(targetId);
+            var icon = link.querySelector('i');
+
+            target.addEventListener('show.bs.collapse', function () {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            });
+
+            target.addEventListener('hide.bs.collapse', function () {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            });
+        });
+    });
+    </script>
+    
 </body>
 </html>

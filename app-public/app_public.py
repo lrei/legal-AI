@@ -1,6 +1,3 @@
-### App version accessible to a public user - default parameters used.
-### Start the app by running this Python file or via cmd.
-
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -9,6 +6,7 @@ import uvicorn
 import llm
 from examples import examples
 import os
+from starlette.middleware.sessions import SessionMiddleware
 
 # Load configuration from the config file
 with open('app-public/config_public.yaml', 'r') as f:
@@ -19,6 +17,9 @@ app = FastAPI(
     description="An API to retrieve legal articles and generate responses using LLMs.",
     version="1.0.0"
 )
+
+# Add SessionMiddleware for session management
+app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 
 templates = Jinja2Templates(directory="app-public")
 
@@ -83,16 +84,27 @@ def index(request: Request):
 def query(
     request: Request,
     query: str = Form(..., description="Describe your legal matter."),
-    api_key: str = Form(..., description="OpenAI API Key.")
+    api_key: str = Form(None, description="OpenAI API Key."),
+    store_api_key: str = Form(None, description="Store API Key for the session.")
 ):
     user_query = query
     error_message = ''
+    session = request.session
+
+    # Handle API Key
+    if not api_key:
+        api_key = session.get('api_key')
 
     if not api_key:
         error_message = "Please provide your OpenAI API Key."
         prompt = ''
         responses = []
     else:
+        if store_api_key:
+            session['api_key'] = api_key
+        else:
+            session.pop('api_key', None)
+
         # Use parameters from config
         max_tokens = config.get('max_tokens', 3000)
         openai_model = config.get('openai_model', 'gpt-3.5-turbo')
@@ -148,7 +160,7 @@ def query(
             'error_message': error_message
         })
     else:
-        # Pass 'examples' to the template
+        # Pass 'examples' and 'request' to the template
         return templates.TemplateResponse(
             'ui_public.html',
             {
@@ -164,4 +176,3 @@ def query(
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8001)
-
