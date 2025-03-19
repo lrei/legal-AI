@@ -10,9 +10,27 @@ The project workflow consists of four main stages:
 - Data Collection: Scraping data from four AI-related European regulations (European Artificial Intelligence Act, Data Act, Data Governance Act, and the General Data Protection Regulation) and parsing it into overlapping passages.
 - Embedding and Storage: Embedding passages, storing the metadata in SQLite databases, and storing the embeddings separately in LanceDB vector database files.
 - Article Retrieval: Implementing an article retrieval system that retrieves the most relevant articles above a certain similarity threshold using vector similarity search.
-- Web Application Development: Developing a web application that constructs a prompt based on the user's query and the retrieved articles, which is then sent to GPT-3.5 Turbo. Both the articles and the LLM response are displayed on the website.
+- Web Application Development: Developing a web application that constructs a prompt based on the user's query and the retrieved articles, which is then sent to the LLM (default OpeinaAI GPT). Both the articles and the LLM response are displayed on the website.
 
 You are required to have a valid OpenAI API key to use this application and generate responses.
+
+## Citation
+```bibtex
+@inproceedings{compliance24,
+  author       = {Barbara Makovec and
+                  Luis Rei and
+                  Inna Novalija},
+  title        = {Preparing {AI} for Compliance: Initial Steps of a Framework for Teaching
+                  LLMs to Reason About Compliance},
+  booktitle    = {Companion Proceedings of the 8th International Joint Conference on
+                  Rules and Reasoning},
+  series       = {{CEUR} Workshop Proceedings},
+  volume       = {3816},
+  publisher    = {CEUR-WS.org},
+  year         = {2024},
+  url          = {https://ceur-ws.org/Vol-3816/paper63.pdf},
+}
+```
 
 ## Project Workflow
 
