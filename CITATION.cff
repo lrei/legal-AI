@@ -1,0 +1,39 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: AI Legal Assistant
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - name: >-
+      Department for Artificial Intelligence, Jožef Stefan
+      Institute
+    website: 'https://ailab.ijs.si/'
+    city: Ljubljana
+    post-code: '1000'
+  - given-names: Luis
+    family-names: Rei
+    email: luis.rei@ijs.si
+    affiliation: Jožef Stefan Institute
+    orcid: 'https://orcid.org/0000-0001-8587-1638'
+  - given-names: ' Inna'
+    orcid: 'https://orcid.org/0000-0003-2598-0116'
+    affiliation: Jožef Stefan Institute
+    family-names: Novalija
+    email: inna.koval@ijs.si
+  - given-names: Barbara
+    email: makovecbarbara1@gmail.com
+    family-names: Markovec
+  - given-names: Lan
+    family-names: Rojs
+    email: lan.rojs3@gmail.com
+repository-code: 'https://github.com/lrei/legal-AI/'
+abstract: >-
+  AI Legal Assistant is a tool for processing and analyzing
+  legal documents related to artificial intelligence. It
+  functions as a Retrieval-Augmented Generation (RAG)
+  application.
+license: MIT
