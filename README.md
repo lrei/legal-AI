@@ -215,3 +215,10 @@ docker run -d -p 8001:8001 --name legal-ai-container legal-ai-app
 
 ![ai_interface](https://github.com/user-attachments/assets/8259c907-afb5-4724-a170-3be874d71821)
 
+
+## Acknowledgements
+
+- Originally developed in [enRichMyData](https://enrichmydata.eu) funded from the European Union’s Horizon Europe research and innovation programme under grant agreement No 101070284
+- Now being developed in [DataPACT](https://datapact.eu) funded from the European Union’s Horizon Europe research and innovation programme under grant agreement No 101189771
+
+
