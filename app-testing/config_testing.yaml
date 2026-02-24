@@ -1,9 +1,9 @@
-max_tokens: 8000
-openai_model: "gpt-3.5-turbo-16k"
-max_articles: 10
-threshold: 0.5
+max_tokens: 16000
+openai_model: "gpt-4.1-mini"
+max_articles: 7
+threshold: 0.3
 sentence_transformer_model: "BAAI/bge-small-en-v1.5"
-reranker_model: "sentence-transformers/all-MiniLM-L6-v2"
+reranker_model: "BAAI/bge-reranker-base"
 num_responses: 1
 temperature: 0.5
 prompt_template: |
